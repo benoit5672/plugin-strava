@@ -64,6 +64,10 @@ class strava extends eqLogic {
     // for this module. It contains the API key (to identify external access)
     // and the identifiant (ID) of the user. 
     //
+    // For the authorization (OAUTH2), the callback is authorization.php
+    // This URL must be accessible from the internet, so we use the external
+    // address configured in JEEDOM
+    //
     public function getStravaProvider() {
 
         return new StravaProvider([
@@ -76,6 +80,10 @@ class strava extends eqLogic {
     //
     // function that trigger the STRAVA authorization mechanism, and
     // associate the user in the plugin with the strava account
+    //
+    // This has to be called only once. After the access has been granted
+    // then, we will use authenticationToken that we need to refresh
+    // on a regular basis.
     //
     public function connectWithStrava() {
         @session_start();
@@ -105,34 +113,42 @@ class strava extends eqLogic {
            $this->setConfiguration('accessToken', $newToken->jsonSerialize());
            $this->save();
            return $newToken;
-	}
+        }
         return $currentToken;
     }
 
+    // 
+    // Send a Request to STRAVA.
+    // 1. try with the existing authenticationToken (we don't keep track of the 
+    //    expiration date of the token
+    // 2. if it fails, then retry with a new fresh token
+    //
     private function authenticatedRequest($_type, $_request, $_options = array()) {
         $provider = $this->getStravaProvider();
         try {
-		$request = $provider->getAuthenticatedRequest(
-			$_type, 
-			StravaProvider::BASE_STRAVA_API_URL . $_request, 
-			$this->getAccessToken(), 
-			$_options);
-            return json_decode((string)$provider->getResponse($request)->getBody(), true);
+            $request = $provider->getAuthenticatedRequest(
+                $_type, 
+                StravaProvider::BASE_STRAVA_API_URL . $_request, 
+                $this->getAccessToken(), 
+                $_options);
+                return json_decode((string)$provider->getResponse($request)->getBody(), true);
         } catch (Exception $e) {
-    
+            // just ignore the exception, and retry with a new (refreshed) token
         }
-	// Try again, with a new access token
-	$request = $provider->getAuthenticatedRequest(
-		$_type, 
-		StravaProvider::BASE_STRAVA_API_URL . $_request, 
-		$this->getAccessToken(true), 
-		$_options);
+        // Try again, with a new access token
+        $request = $provider->getAuthenticatedRequest(
+            $_type, 
+            StravaProvider::BASE_STRAVA_API_URL . $_request, 
+            $this->getAccessToken(true), 
+            $_options);
          return json_decode((string)$provider->getResponse($request)->getBody(), true);
     }
 
 
     //
     // Subscription section
+    // we use a different StravaProvider, because for the subscriptions push service,
+    // we use another callback URL: webhook.php
     // 
     public function getSubscriptionProvider() {
 
@@ -143,13 +159,15 @@ class strava extends eqLogic {
          ]);
     }
 
-    // Create a 'verify_token' for this eqLogic
+    //
+    // Send unauthenticated request to STRAVA, use only for subscriptions push requests
+    //
     private function request(_$type, $_request, $_options = array()) {
         $provider = $this->getSubscriptionProvider();
-	$request = $provider->getRequest(
-		$_type, 
-		StravaProvider::BASE_STRAVA_API_URL . $_request, 
-		$_options);
+    $request = $provider->getRequest(
+        $_type, 
+        StravaProvider::BASE_STRAVA_API_URL . $_request, 
+        $_options);
          return json_decode((string)$provider->getResponse($request)->getBody(), true);
     }
 
@@ -163,21 +181,21 @@ class strava extends eqLogic {
        //
        $rsp = viewSubscription();
        if (isset($rsp['id']) && ($_force == true)) {
-	   // Delete existing subscription
-	   $this->deleteSubscription();
+       // Delete existing subscription
+       $this->deleteSubscription();
 
-	   // Create a new verify_token, and save it ! 
-	   $token = config::getKey();
-	   $this->setConfiguration('subscription_token', $token);
+       // Create a new verify_token, and save it ! 
+       $token = config::getKey();
+       $this->setConfiguration('subscription_token', $token);
 
-	   // and create the subscription, using webhook callback
-	   $rsp = $this->request(
-	        StravaProvider::METHOD_POST, 
-	  	'push_subscriptions', 
-	  	['verify_token' => $token)]);
+       // and create the subscription, using webhook callback
+       $rsp = $this->request(
+            StravaProvider::METHOD_POST, 
+          'push_subscriptions', 
+          ['verify_token' => $token]);
            if (!isset($rsp['id'])) {
-	       throw new Exception(__('Impossible de creer une souscription STRAVA', __FILE__));
-	   }
+           throw new Exception(__('Impossible de creer une souscription STRAVA', __FILE__));
+       }
        }
        $this->setConfiguration('subcription_id', $rsp['id']);
        return $rsp['id'];
@@ -190,15 +208,15 @@ class strava extends eqLogic {
     public function deleteSubscription() {
         $this->request(
             'DELETE',
-	    'push_subscriptions/' . $this->getConfiguration('subscription_id'), 
-	    ['verify_token' => $this->getConfiguration('subscription_token'])
-    	);
+        'push_subscriptions/' . $this->getConfiguration('subscription_id'), 
+        ['verify_token' => $this->getConfiguration('subscription_token')]
+        );
     }
 
     //
     // View subscription to PUSH notifications from STRAVA
     //
-    public public viewSubscription() {
+    public function viewSubscription() {
        return $this->request(StravaProvider::METHOD_GET, 'push_subscriptions');
     }
 
@@ -211,7 +229,10 @@ class strava extends eqLogic {
     // 
     public function preRemove() {
        // Unsubscribe to STRAVA push notification
-       $this->deleteSubscription();
+       try {
+          $this->deleteSubscription();
+       } catch(Exception $e) {
+       }
     }
 
     /*     * **********************Getteur Setteur*************************** */

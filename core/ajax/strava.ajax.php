@@ -33,10 +33,10 @@ try {
     // Added my methods here....
     if (init('action') == 'connectWithStrava') {
         $eqLogic = eqLogic::byId(init('id'));
-	if (!is_object($eqLogic)) {
-	    throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
-	}
-	ajax::success(array('redirect' => $eqLogic->connectWithStrava()));
+	    if (!is_object($eqLogic)) {
+	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	    }
+	    ajax::success(array('redirect' => $eqLogic->connectWithStrava()));
     }
 
 

@@ -123,16 +123,29 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             <div class="form-group">
                                 <label class="col-lg-3 control-label">{{Authorization Callback Domain}}</label>
                                 <div class="col-lg-9">
-                                    <span><?php echo network::getNetworkAccess('external') . '/plugins/strava/core/php/authorization.php?apikey=' . jeedom::getApiKey('strava') . '&eqLogic_id='; ?><span class="stravaEqLogicId"></span></span>
+                                    <span>
+                                        <?php 
+                                            $components = parse_url(network::getNetworkAccess('external'));
+                                            if (!isset($components['host'])) {
+                                               echo "Remplisser la partie acces exterieur dans la configuration jeedom";
+                                            } else {
+                                               echo $components['host'];
+                                            } 
+                                        ?>
+                                    </span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-lg-3 control-label">{{Se connecter avec Strava}}</label>
-				<div class="col-lg-2">
+                                <label class="col-lg-3 control-label">{{Connection Strava}}</label>
+                                <div class="col-lg-4">
                                    <img id="bt_connectWithStrava" src="/plugins/strava/desktop/images/btn_strava_connectwith_orange.png" style="max-width:193;max-height:48"/>
                                 </div>
+                                <div class="col-lg-4">
+                                   <a class="btn btn-danger eqLogicAction roundedLeft" data-action="bt_disconnectFromStrava"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{Revoquer}}</span></a>
+                                </div>
                             </div>
-			   
+
+               
 
                             <!-- Champ de saisie du cron d'auto-actualisation + assistant cron -->
                             <!-- La fonction cron de la classe du plugin doit contenir le code prévu pour que ce champ soit fonctionnel -->
@@ -153,7 +166,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             </div-->
                         </div>
 
-			<!-- Partie droite de l'onglet "Equipement" -->
+            <!-- Partie droite de l'onglet "Equipement" -->
                         <!-- Affiche l'icône du plugin par défaut mais vous pouvez y afficher les informations de votre choix -->
                         <div class="col-lg-5">
                             <legend><i class="fas fa-info"></i> {{Informations}}</legend>
