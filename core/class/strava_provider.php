@@ -29,15 +29,31 @@ use Psr\Http\Message\ResponseInterface;
  * Implement Abstract methods of the Abstract provider class.
  */
 
-class StravaProvider extends AbstractProvider
-{
+class StravaProvider extends AbstractProvider {
+
     use BearerAuthorizationTrait;
 
     const ACCESS_TOKEN_RESOURCE_OWNER_ID = 'athlete.id';
     const BASE_STRAVA_URL                = 'https://www.strava.com';
 
+    protected $apiVersion = 'v3';
+
+    public function __construct(array $options = [], array $collaborators = []) {
+        parent::__construct($options, $collaborators);
+
+        foreach ($options as $option => $value) {
+            if (property_exists($this, $option)) {
+                $this->{$option} = $value;
+            }
+        }
+    }
+
     public function getBaseAuthorizationUrl() {
         return self::BASE_STRAVA_URL . '/oauth/authorize';
+    }
+
+    public function getBaseDeauthorizationUrl() {
+        return self::BASE_STRAVA_URL . '/oauth/deauthorize';
     }
 
     public function getBaseAccessTokenUrl(array $params) {
@@ -45,8 +61,26 @@ class StravaProvider extends AbstractProvider
     }
 
     public function getResourceOwnerDetailsUrl(AccessToken $token) {
-        return self::BASE_STRAVA_URL . '/api/v3/athlete';
+        return self::BASE_STRAVA_URL . '/api/' . $this->apiVersion . '/athlete';
     }
+
+    /*
+    public function getBaseSubscriptionsUrl() {
+        return self::BASE_STRAVA_URL . '/api/' . $this->apiVersion . '/push_subscriptions';
+    }
+
+    public function getSubscriptionsRequest($_type, $_request, array $_options = []) {
+        //$url = $this->getBaseSubscriptionUrl() . $_request;
+        $url = $_request;
+        $options = [
+            'client_id' => $this->clientId,
+            'client_secret' => $this->clientSecret
+        ];
+		$options = array_merge_recursive($options, $_options);
+        log::add('strava', 'debug', 'SEND SUBSCRIPTION ' . $_type . ', ' . $url . ', options='. print_r($options, true)); 
+        return $this->getRequest($_type, $url, $options);
+    }
+     */
 
     // see https://strava.github.io/api/v3/oauth/#get-authorize
     protected function getDefaultScopes() {

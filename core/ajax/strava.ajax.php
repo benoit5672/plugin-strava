@@ -31,7 +31,7 @@ try {
     ajax::init();
 
     // Added my methods here....
-    if (init('action') == 'connectWithStrava') {
+    if (init('action') === 'connectWithStrava') {
         $eqLogic = eqLogic::byId(init('id'));
 	    if (!is_object($eqLogic)) {
 	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
@@ -39,6 +39,41 @@ try {
 	    ajax::success(array('redirect' => $eqLogic->connectWithStrava()));
     }
 
+    /*
+    if (init('action') === 'disconnectFromStrava') {
+        $eqLogic = eqLogic::byId(init('id'));
+	    if (!is_object($eqLogic)) {
+	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	    }
+        $eqLogic->disconnectFromStrava();
+	    ajax::success();
+    }
+    */
+
+    if (init('action') === 'viewSubscription') {
+        $eqLogic = eqLogic::byId(init('id'));
+	    if (!is_object($eqLogic)) {
+	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	    }
+        ajax::success(array('subscriptionId' => $eqLogic->viewSubscription()));
+    }
+
+    if (init('action') === 'deleteSubscription') {
+        $eqLogic = eqLogic::byId(init('id'));
+	    if (!is_object($eqLogic)) {
+	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	    }
+        $eqLogic->deleteSubscription();
+        ajax::success();
+    }
+
+    if (init('action') === 'createSubscription') {
+        $eqLogic = eqLogic::byId(init('id'));
+	    if (!is_object($eqLogic)) {
+	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	    }
+        ajax::success(array('subscriptionId' => $eqLogic->createSubscription()));
+    }
 
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */

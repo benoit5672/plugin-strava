@@ -70,10 +70,10 @@ $eqLogics = eqLogic::byType($plugin->getId());
         <div class="tab-content">
             <!-- Onglet de configuration de l'équipement -->
             <div role="tabpanel" class="tab-pane active" id="eqlogictab">
-                <!-- Partie gauche de l'onglet "Equipements" -->
-                <!-- Paramètres généraux de l'équipement -->
                 <form class="form-horizontal">
                     <fieldset>
+                        <!-- Partie gauche de l'onglet "Equipements" -->
+                        <!-- Paramètres généraux de l'équipement -->
                         <div class="col-lg-7">
                             <legend><i class="fas fa-wrench"></i> {{Général}}</legend>
                             <div class="form-group">
@@ -121,8 +121,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-lg-3 control-label">{{Authorization Callback Domain}}</label>
-                                <div class="col-lg-9">
+                                <label class="col-sm-3 control-label help" data-help="{{Domaine a renseigner sur la page Strava 'My API Application'}}">{{Authorization Callback Domain}}</label>
+                                <div class="col-sm-6">
                                     <span>
                                         <?php 
                                             $components = parse_url(network::getNetworkAccess('external'));
@@ -141,43 +141,43 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                    <img id="bt_connectWithStrava" src="/plugins/strava/desktop/images/btn_strava_connectwith_orange.png" style="max-width:193;max-height:48"/>
                                 </div>
                                 <div class="col-lg-4">
-                                   <a class="btn btn-danger eqLogicAction roundedLeft" data-action="bt_disconnectFromStrava"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{Revoquer}}</span></a>
+                                   <a class="btn btn-danger roundedLeft bt_disconnectFromStrava"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{Revoquer}}</span></a>
                                 </div>
                             </div>
-
-               
-
-                            <!-- Champ de saisie du cron d'auto-actualisation + assistant cron -->
-                            <!-- La fonction cron de la classe du plugin doit contenir le code prévu pour que ce champ soit fonctionnel -->
-                            <!--div class="form-group"> 
-                                <label class="col-sm-3 control-label">{{Auto-actualisation}}
-                                    <sup><i class="fas fa-question-circle tooltips" title="{{Fréquence de rafraîchissement de l'équipement}}"></i></sup>
-                                </label>
-                                <div class="col-sm-7">
-                                    <div class="input-group">
-                                        <input type="text" class="eqLogicAttr form-control roundedLeft" data-l1key="configuration" data-l2key="autorefresh" placeholder="{{Cliquer sur ? pour afficher l'assistant cron}}"/>
-                                        <span class="input-group-btn">
-                                            <a class="btn btn-default cursor jeeHelper roundedRight" data-helper="cron" title="Assistant cron">
-                                                <i class="fas fa-question-circle"></i>
-                                            </a>
-                                        </span>
-                                    </div>
+                            <div class="form-group">
+                                <div class="col-lg-2">
+                                   <a class="btn btn-warning roundedLeft bt_viewSubscription"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{View Subscription}}</span></a>
                                 </div>
-                            </div-->
+                                <div class="col-lg-2">
+                                   <a class="btn btn-warning roundedLeft bt_createSubscription"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{Create Subscription}}</span></a>
+                                </div>
+                                <div class="col-lg-2">
+                                   <a class="btn btn-default roundedLeft bt_deleteSubscription"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{Delete Subscription}}</span></a>
+                                </div>
+                            </div>
                         </div>
-
-            <!-- Partie droite de l'onglet "Equipement" -->
+                        <!-- Partie droite de l'onglet "Equipement" -->
                         <!-- Affiche l'icône du plugin par défaut mais vous pouvez y afficher les informations de votre choix -->
                         <div class="col-lg-5">
                             <legend><i class="fas fa-info"></i> {{Informations}}</legend>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{Connection Active}}</label>
+                                <div class="col-sm-1">oui
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">{{Webhook Active}}</label>
+                                <div class="col-sm-1">oui
+                                </div>
+                            </div> 
                             <div class="form-group">
                                 <div class="text-center">
                                     <img name="icon_visu" src="<?= $plugin->getPathImgIcon(); ?>" style="max-width:160px;"/>
                                 </div>
                             </div>
                         </div>
-                    </fieldset>
-                </form>
+                    </fieldset> <!-- fieldset eqlogictab -->
+                </form> <!-- form eqlogitab -->
                 <hr>
             </div><!-- /.tabpanel #eqlogictab-->
 

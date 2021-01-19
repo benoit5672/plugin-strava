@@ -23,7 +23,7 @@ if (!isConnect()) {
 // As we extend AbstractProvider from League, then we should get our provider
 // check the state session compared to the state of the request
 // 
-$provider = $eqLogic->getStravaProvider();
+$provider = $eqLogic->getProvider();
 
 // Check given state against previously stored one to mitigate CSRF attack
 if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {

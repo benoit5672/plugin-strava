@@ -19,9 +19,7 @@
 
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 
-
-log::add('strava', 'error', 'Received authorization request: ' . $_SERVER['REQUEST_URI']);
-
+log::add('strava', 'debug', 'Received authorization request: ' . $_SERVER['REQUEST_URI']);
 
 include_file('core', 'authentification', 'php');
 if (!jeedom::apiAccess(init('apikey'), 'strava')) {
@@ -38,7 +36,7 @@ $names=['eqLogic_id', 'amp;eqLogic_id', 'amp;amp;eqLogic_id'];
 $eqLogic = NULL;
 foreach ($names as $name) {
     $eqLogic = eqLogic::byId(init($name));
-    if (is_object($eqLogic) && method_exists($eqLogic, 'getStravaProvider')) {
+    if (is_object($eqLogic) && method_exists($eqLogic, 'getProvider')) {
         break;
     }
     $eqLogic = NULL;
@@ -54,12 +52,13 @@ if (!is_object($eqLogic)) {
 // As we extend AbstractProvider from League, then we should get our provider
 // check the state session compared to the state of the request
 // 
-$provider = $eqLogic->getStravaProvider();
+$provider = $eqLogic->getProvider();
 
 //
 // Check given state against previously stored one to mitigate CSRF attack
 //
-if (empty($_GET['state']) || (!empty($_SESSION['oauth2state']) and ($_GET['state'] !== $_SESSION['oauth2state']))) {
+//if (empty($_GET['state']) || (!empty($_SESSION['oauth2state']) and ($_GET['state'] !== $_SESSION['oauth2state']))) {
+if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
 
     log::add('strava', 'error', '_GET=' . $_GET['state'] . ', _SESSION=' . $_SESSION['oauth2state']);
 
@@ -83,23 +82,32 @@ try {
     //$eqLogic->getInfoFromStrava();
 
     // Optional: Now you have a token you can look up a users profile data
-    //try {
+    try {
         // We got an access token, let's now get the user's details
-        //$user = $provider->getResourceOwner($token);
+        $user = $provider->getResourceOwner($token);
 
         // Use these details to create a new profile
-        //printf('Hello %s!', $user->getFirstName() . ' ' . $user->getLastName());
-    //} catch (Exception $e) {
+        log::add('strava', 'info', 'Authorization of user ' . $user->getFirstName() . ' ' 
+            . $user->getLastName() . '(' . $user->getId() . ') succeed !');
+        $eqLogic->setStravaId($user->getId());
+
+        // Create webhook subscription for this user
+        // @todo
+        //$eqLogic->createSubscription(true);
+    } catch (Exception $e) {
 
         // Failed to get user details
-    //    exit('Oh dear...');
-    //}
+        log::add('strava', 'error', $e->getMessage());
+        $eqLogic->setStravaId(-1);
+        exit($e->getMessage());
+    }
     //
     //
     // At the end of the callback, go back to the configuration page of the STRAVA user 
     redirect(network::getNetworkAccess('external') . '/index.php?v=d&p=strava&m=strava&id=' . $eqLogic->getId());
 
 } catch (Exception $e) {
+    log::add('strava', 'error', $e->getMessage());
     http_error_code(500);
 	exit(print_r($e));
 }
