@@ -107,7 +107,6 @@ $('#bt_connectWithStrava').on('click', function () {
 
 
 //$('#bt_disconnectFromStrava').on('click', function () {
-/*
 $('body').off('click','.bt_disconnectFromStrava').on('click','.bt_disconnectFromStrava', function () {
     console.log('----> CLICK ON bt_disconnectFromStrava');
     $.ajax({
@@ -129,7 +128,6 @@ $('body').off('click','.bt_disconnectFromStrava').on('click','.bt_disconnectFrom
         }
     });
 });
-*/
 
 
 $('body').off('click','.bt_viewSubscription').on('click','.bt_viewSubscription', function () {
@@ -200,6 +198,78 @@ $('body').off('click','.bt_createSubscription').on('click','.bt_createSubscripti
             } else {
                 console.log('id = ' + data.result.subscriptionId);
             }
+        }
+    });
+});
+
+
+/*
+$('body').off('click','.bt_getAuthenticatedAthlete').on('click','.bt_getAuthenticatedAthlete', function () {
+    console.log('----> CLICK ON bt_getAuthenticatedAthlete');
+    $.ajax({
+        type: "POST", 
+        url: "plugins/strava/core/ajax/strava.ajax.php", 
+        data: {
+            action: "getAuthenticatedAthlete",
+            id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
+        },
+        dataType: 'json',
+        error: function (request, status, error) 
+            handleAjaxError(request, status, error);
+        },
+        success: function (data) {
+            if (data.state != 'ok') {
+                $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                return;
+            } 
+        }
+    });
+});
+*/
+
+
+$('body').off('click','.bt_getAthleteStats').on('click','.bt_getAthleteStats', function () {
+    console.log('----> CLICK ON bt_getAthleteStats');
+    $.ajax({
+        type: "POST", 
+        url: "plugins/strava/core/ajax/strava.ajax.php", 
+        data: {
+            action: "getAthleteStats",
+            id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
+        },
+        dataType: 'json',
+        error: function (request, status, error) {
+            handleAjaxError(request, status, error);
+        },
+        success: function (data) {
+            if (data.state != 'ok') {
+                $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                return;
+            } 
+        }
+    });
+});
+
+
+
+$('body').off('click','.bt_getDailyActivitiesStats').on('click','.bt_getDailyActivitiesStats', function () {
+    console.log('----> CLICK ON bt_getDailyActivitiesStats');
+    $.ajax({
+        type: "POST", 
+        url: "plugins/strava/core/ajax/strava.ajax.php", 
+        data: {
+            action: "getDailyActivitiesStats",
+            id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
+        },
+        dataType: 'json',
+        error: function (request, status, error) {
+            handleAjaxError(request, status, error);
+        },
+        success: function (data) {
+            if (data.state != 'ok') {
+                $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                return;
+            } 
         }
     });
 });

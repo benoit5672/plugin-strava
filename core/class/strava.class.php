@@ -100,6 +100,35 @@ class strava extends eqLogic {
          ]);
     }
 
+    // 
+    // Send a Request to STRAVA.
+    // 1. try with the existing authenticationToken (we don't keep track of the 
+    //    expiration date of the token
+    // 2. if it fails, then retry with a new fresh token
+    //
+    private function getRequest($_verb, $_url, $_options = array()) {
+        //log::add('strava', 'debug', 'SEND ' . $_verb . ', ' . $_url . ', ' . print_r($_options, true)); 
+        $provider = $this->getProvider();
+        try {
+            $rsp = $provider->getAuthenticatedRequest(
+                $_verb, 
+                $_url, 
+                $this->getAccessToken(), 
+                $_options);
+            return json_decode((string)$provider->getResponse($rsp)->getBody(), true);
+        } catch (Exception $e) {
+            // just ignore the exception, and retry with a new (refreshed) token
+            log::add('strava', 'debug', 'getRequest raised: ' . $e->getMessage());
+        }
+        // Try again, with a new access token
+        $rsp = $provider->getAuthenticatedRequest(
+            $_verb, 
+            $_url, 
+            $this->getAccessToken(true), 
+            $_options);
+        return json_decode((string)$provider->getResponse($rsp)->getBody(), true);
+    }
+
     //
     // function that trigger the STRAVA authorization mechanism, and
     // associate the user in the plugin with the strava account
@@ -126,7 +155,9 @@ class strava extends eqLogic {
         $provider            = $this->getProvider();
         $deauthorizationUrl  = $provider->getBaseDeauthorizationUrl();
         try {
-            $this->getRequest(StravaProvider::POST, $deauthorizationUrl);
+            $this->getRequest('POST', $deauthorizationUrl);
+            $this->setConfiguration('strava_id', -1);
+            $this->setConfiguration('subscription_id', -1);
         } catch (Exception $e) {
             log::add('strava', 'error', 'Failed to deauthorized user: ' . $e->getMessage());
             throw $e;
@@ -134,7 +165,7 @@ class strava extends eqLogic {
         
         // Delete the information from the session
         //@todo $_SESSION = array();
-        unset($_SESSION['oauth2state']);
+        //unset($_SESSION['oauth2state']);
     }
 
              
@@ -146,59 +177,19 @@ class strava extends eqLogic {
     // token through this method
     // 
     public function getAccessToken($_force = false) {
-        log::add('strava', 'debug', 'BR>> getAccessToken #1 ' . $_force);
         $currentToken = new AccessToken($this->getConfiguration('accessToken'));
-        log::add('strava', 'debug', 'BR>> getAccessToken #1.5');
         if ($currentToken->hasExpired() || $_force == true) {
-           log::add('strava', 'debug', 'BR>> getAccessToken #2');
            // We are using default GrantFactory, so refresh_token
            // will become RefreshToken class
            $provider = $this->getProvider();
-           log::add('strava', 'debug', 'BR>> getAccessToken #3');
            $newToken = $provider->getAccessToken('refresh_token', [
                'refresh_token' => $currentToken->getRefreshToken()]);
            // Same has before, store the new token
-           log::add('strava', 'debug', 'BR>> getAccessToken #4');
            $this->setConfiguration('accessToken', $newToken->jsonSerialize());
            $this->save();
-           log::add('strava', 'debug', 'BR>> getAccessToken #5');
            return $newToken;
         }
-        log::add('strava', 'debug', 'BR>> getAccessToken #6');
         return $currentToken;
-    }
-
-    // 
-    // Send a Request to STRAVA.
-    // 1. try with the existing authenticationToken (we don't keep track of the 
-    //    expiration date of the token
-    // 2. if it fails, then retry with a new fresh token
-    //
-    private function getRequest($_type, $_url, $_options = array()) {
-        log::add('strava', 'debug', 'SEND ' . $_type . ', ' . $_url); 
-        $provider = $this->getProvider();
-        try {
-            log::add('strava', 'debug', 'BR>> getRequest #1');
-            $rsp = $provider->getAuthenticatedRequest(
-                $_type, 
-                $_url, 
-                $this->getAccessToken(), 
-                $_options);
-            log::add('strava', 'debug', 'BR>> getRequest #2');
-            return json_decode((string)$provider->getResponse($rsp)->getBody(), true);
-        } catch (Exception $e) {
-            // just ignore the exception, and retry with a new (refreshed) token
-            log::add('strava', 'debug', 'getRequest raised: ' . $e->getMessage());
-        }
-        // Try again, with a new access token
-        log::add('strava', 'debug', 'BR>> getRequest #3');
-        $rsp = $provider->getAuthenticatedRequest(
-            $_type, 
-            $_url, 
-            $this->getAccessToken(true), 
-            $_options);
-        log::add('strava', 'debug', 'BR>> getRequest #4');
-        return json_decode((string)$provider->getResponse($rsp)->getBody(), true);
     }
 
     // 
@@ -213,8 +204,90 @@ class strava extends eqLogic {
     }
 
     public function isRegisteredToStrava() {
-        $id = int($this->getConfiguration('strava_id', -1)); 
+        $id = $this->getConfiguration('strava_id', -1); 
         return ($id !== -1);
+    }
+
+
+    public function getAthleteStats() {
+        log::add('strava', 'debug', 'BR>> getAthleteStats #1');
+        if ($this->isRegisteredToStrava()) {
+            log::add('strava', 'debug', 'BR>> getAthleteStats #2');
+            $rsp = $this->getRequest(
+                'GET', 
+                $this->getProvider()->getBaseApi() . '/athletes/' . $this->getConfiguration('strava_id') . '/stats');
+            log::add('strava', 'debug', 'BR>> getAthleteStats #3 (rx:' . print_r($rsp, true) . ')');
+        } else {
+            log::add('strava', 'warn', __('Vous n\'etes pas connecte a Strava', __FILE__));
+        }
+        log::add('strava', 'debug', 'BR>> getAthleteStats #4');
+    }
+
+    public function getAuthenticatedAthlete() {
+        if ($this->isRegisteredToStrava()) {
+            $rsp = $this->getRequest(
+                'GET', 
+                $this->getProvider()->getBaseApi() . '/athlete');
+        } else {
+            log::add('strava', 'warn', __('Vous n\'etes pas connecte a Strava', __FILE__));
+        }
+    }
+
+
+    public function getDailyActivitiesStats() {
+        $before   = time();
+        $after    = strtotime('yesterday'); 
+        $after    = strtotime('Monday this week'); 
+        return $this->getActivitiesStats($before, $after);
+    }
+
+    public function getYearlyActivitiesStats() {
+        $before   = time();
+        $after    = strtotime('first day of january'.date('Y'));
+        return $this->getActivitiesStats($before, $after);
+    }
+
+    private function getActivitiesStats($_before, $_after) {
+        if ($this->isRegisteredToStrava()) {
+            $page       = 1;
+            $per_page   = 30;
+            $completed  = false;
+            $activities = [];
+            while ($completed === false) {
+                $rsp = $this->getRequest(
+                    'GET', 
+                    $this->getProvider()->getBaseApi() . '/athlete/activities'
+                            .'?before='.$_before.'&after='.$_after.'&page='.$page.'&per_page='.$per_page);
+                log::add('strava', 'debug', 'Add ' . count($rsp) . ' activities');
+                if ($rsp != []) {
+                    $activities = array_merge_recursive($activities, $rsp); 
+                    $page++;
+                } else {
+                    $completed = true; 
+                }
+            } 
+        } else {
+            log::add('strava', 'warn', __('Vous n\'etes pas connecte a Strava', __FILE__));
+        }
+        log::add('strava', 'debug', 'Return ' . count($activities) . ' activities');
+        return $activities;
+    }
+
+
+    public function setAthleteWeight() {
+        if ($this->isRegisteredToStrava()) {
+            $cmd = $this->getCmd(null, 'weight');
+            if (!is_object($cmd)) {
+                log::add('strava', 'error', $this->getHumanName()
+                    . __('Impossible de mettre a jour le poids car la commande n\'existe pas', __FILE__));
+            } else {
+                $rsp = $this->getRequest(
+                    'PUT', 
+                    $this->getProvider()->getBaseApi() . '/athlete?' . $cmd->execCmd());
+            }
+        } else {
+            log::add('strava', 'warn', __('Vous n\'etes pas connecte a Strava', __FILE__));
+        }
     }
 
 
@@ -223,8 +296,8 @@ class strava extends eqLogic {
     //
     // Subscription: see @links: https://developers.strava.com/docs/webhooks/
     //
-    private function subscriptionsRequest($_type, $_url, $_options = array()) {
-        if ($_type === 'GET') {
+    private function subscriptionsRequest($_verb, $_url, $_options = array()) {
+        if ($_verb === 'GET') {
             $url  = $_url . '?client_id=' . urlencode($this->getConfiguration('client_id'));
             $url .= '&client_secret=' . urlencode($this->getConfiguration('client_secret'));
             $data = [];
@@ -242,7 +315,7 @@ class strava extends eqLogic {
                 $data['verify_token'] = $_options['verify_token'];
             } 
         }
-	    log::add('strava', 'debug', ' url ' . $url . ', data=' . print_r($data, true));
+	    //log::add('strava', 'debug', ' url ' . $url . ', data=' . print_r($data, true));
 
         $nbRetry  = 0;
         $maxRetry = 3;
@@ -261,7 +334,7 @@ class strava extends eqLogic {
             curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
 
             // set the verb (POST, GET, DELETE)
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $_type);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $_verb);
 
             $rsp = curl_exec($ch);        
             $nbRetry++;
@@ -275,20 +348,12 @@ class strava extends eqLogic {
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        /**
-        //$httpRequest = new com_http($url);
-        if (count($data) > 0) {
-            $httpRequest->setHeader(array('Content-Type: multipart/form-data'));
-	        $httpRequest->setPost($data);
-        }
-	    $httpRequest->setNoReportError(true);
-		$rsp = $httpRequest->exec(30);
-         */
         log::add('strava', 'debug', 'Response : ' . $rsp . ', code=' . $http_code);
-        if (($_type === 'DELETE' && $http_code != 204)
-            || ($_type === 'POST' && $http_code != 201)
-            || ($_type === 'GET' && $http_code != 200)) { 
-			throw new Exception(__('Erreur lors de la communication avec STRAVA: ', __FILE__) . $rsp . 'http code: ' . $http_code);
+        if (($_verb === 'DELETE' && $http_code != 204)
+            || ($_verb === 'POST' && $http_code != 201)
+            || ($_verb === 'GET' && $http_code != 200)) { 
+            throw new Exception(__('Erreur de communication avec STRAVA: ', __FILE__) 
+                . $rsp . 'http code: ' . $http_code);
 		}
 		return json_decode($rsp, true);
     }
@@ -304,19 +369,14 @@ class strava extends eqLogic {
        $subscriptionId = $this->viewSubscription();
        if ($subscriptionId < 0 or $_force == true) {
 
-           log::add('strava', 'debug', 'BR>> createSubscription #2');
            if ($subscriptionId > 0) {
                // Delete existing subscription
                $this->deleteSubscription();
            }
-           log::add('strava', 'debug', 'BR>> createSubscription #3');
            
            // Create a new verify_token, and save it ! 
            $token = config::genKey();
-           //$this->setConfiguration('subscription_token', $token);
-           //$this->save();
            $this->setCache('subscription_token', $token);
-           log::add('strava', 'debug', 'BR>> createSubscription #4 ' . $token);
 
            // and create the subscription, using webhook callback
            $rsp = $this->subscriptionsRequest(
@@ -327,25 +387,20 @@ class strava extends eqLogic {
                         'verify_token' => $token
                     ]);
 
-           log::add('strava', 'debug', 'BR>> createSubscription #5');
            // The subscriptionsToken is no more used, so reset it
-           //$this->setConfiguration('subscription_token', '');
            $this->setCache('subscription_token', null);
 
            if (!isset($rsp['id'])) {
                log::add('strava', 'error', __('Impossible de creer une souscription STRAVA', __FILE__));
                throw new Exception(__('Impossible de creer une souscription STRAVA', __FILE__));
            }
-           log::add('strava', 'debug', 'BR>> createSubscription #6');
 
            // Save the subscription information
            $subscriptionId = $rsp['id'];
            $this->setConfiguration('subscription_id', $subscriptionId);
            $this->save();
            
-           log::add('strava', 'debug', 'BR>> createSubscription #7');
        }
-       log::add('strava', 'debug', 'BR>> createSubscription #8');
        return $subscriptionId;
     }
 
@@ -388,13 +443,294 @@ class strava extends eqLogic {
     }
 
     public function isRegisteredForSubscription() {
-        $id = int($this->getConfiguration('subscription_id', -1)); 
+        $id = $this->getConfiguration('subscription_id', -1); 
         return ($id !== -1);
+    }
+
+    //
+    // Sport Management Section
+    //
+    private function createCommands($_order, $_logicalId, $_name) {
+        // Total (week)
+        log::add('strava', 'debug', 'Create commands for ' . $_logicalId . ', name=' . $_name . ', index=' . $_order);
+        $cmd = $this->getCmd(null, $_logicalId . '_count');
+		if (!is_object($cmd)) {
+			$cmd = new stravaCmd();
+			$cmd->setLogicalId($_logicalId . '_count');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder($_order);
+			$cmd->setName($_name . __(' (Total)', __FILE__));
+			$cmd->setTemplate('dashboard', 'line');
+			$cmd->setTemplate('mobile', 'line');
+            $_order++;
+        }
+		$cmd->setType('info');
+		$cmd->setSubType('numeric');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+
+        // Distance (week)
+        $cmd = $this->getCmd(null, $_logicalId . '_distance');
+		if (!is_object($cmd)) {
+			$cmd = new stravaCmd();
+			$cmd->setLogicalId($_logicalId . '_distance');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder($_order);
+			$cmd->setName($_name . __(' (Distance)', __FILE__));
+			$cmd->setTemplate('dashboard', 'line');
+			$cmd->setTemplate('mobile', 'line');
+            $_order++;
+        }
+		$cmd->setType('info');
+		$cmd->setSubType('numeric');
+		$cmd->setUnite('kms');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+        
+        // Elevation (week)
+        $cmd = $this->getCmd(null, $_logicalId . '_elevation');
+		if (!is_object($cmd)) {
+			$cmd = new stravaCmd();
+			$cmd->setLogicalId($_logicalId . '_elevation');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder($_order);
+			$cmd->setName($_name . __(' (Denivelle)', __FILE__));
+			$cmd->setTemplate('dashboard', 'line');
+			$cmd->setTemplate('mobile', 'line');
+            $_order++;
+        }
+		$cmd->setType('info');
+		$cmd->setSubType('numeric');
+		$cmd->setUnite('m');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+
+        // time 
+        $cmd = $this->getCmd(null, $_logicalId . '_time');
+		if (!is_object($cmd)) {
+			$cmd = new stravaCmd();
+			$cmd->setLogicalId($_logicalId . '_time');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder($_order);
+			$cmd->setName($_name . __(' (Temps)', __FILE__));
+			$cmd->setTemplate('dashboard', 'line');
+			$cmd->setTemplate('mobile', 'line');
+            $_order++;
+        }
+		$cmd->setType('info');
+		$cmd->setSubType('numeric');
+		$cmd->setUnite('s');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+        
+        //
+        // Total (year)
+        $cmd = $this->getCmd(null, $_logicalId . '_count_year');
+		if (!is_object($cmd)) {
+			$cmd = new stravaCmd();
+			$cmd->setLogicalId($_logicalId . '_count_year');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder($_order);
+			$cmd->setName($_name . __(' (Total annuel)', __FILE__));
+			$cmd->setTemplate('dashboard', 'line');
+			$cmd->setTemplate('mobile', 'line');
+            $_order++;
+        }
+		$cmd->setType('info');
+		$cmd->setSubType('numeric');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+
+        // Distance (year)
+        $cmd = $this->getCmd(null, $_logicalId . '_distance_year');
+		if (!is_object($cmd)) {
+			$cmd = new stravaCmd();
+			$cmd->setLogicalId($_logicalId . '_distance_year');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder($_order);
+			$cmd->setName($_name . __(' (Distance annuelle)', __FILE__));
+			$cmd->setTemplate('dashboard', 'line');
+			$cmd->setTemplate('mobile', 'line');
+            $_order++;
+        }
+		$cmd->setType('info');
+		$cmd->setSubType('numeric');
+		$cmd->setUnite('kms');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+        
+        // Elevation (year)
+        $cmd = $this->getCmd(null, $_logicalId . '_elevation_year');
+		if (!is_object($cmd)) {
+			$cmd = new stravaCmd();
+			$cmd->setLogicalId($_logicalId . '_elevation_year');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder($_order);
+			$cmd->setName($_name . __(' (Denivelle annuel)', __FILE__));
+			$cmd->setTemplate('dashboard', 'line');
+			$cmd->setTemplate('mobile', 'line');
+            $_order++;
+        }
+		$cmd->setType('info');
+		$cmd->setSubType('numeric');
+		$cmd->setUnite('m');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+        
+        // time (year)
+        $cmd = $this->getCmd(null, $_logicalId . '_time_year');
+		if (!is_object($cmd)) {
+			$cmd = new stravaCmd();
+			$cmd->setLogicalId($_logicalId . '_time_year');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder($_order);
+			$cmd->setName($_name . __(' (Temps annuel)', __FILE__));
+			$cmd->setTemplate('dashboard', 'line');
+			$cmd->setTemplate('mobile', 'line');
+            $_order++;
+        }
+		$cmd->setType('info');
+		$cmd->setSubType('numeric');
+		$cmd->setUnite('heures');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+    }
+
+    private function deleteCommands($_logicalId) {
+
+        $extensions = ['_count', '_distance', '_elevation', '_time',
+                       '_count_year', '_distance_year', '_elevation_year', '_time_year'];
+
+        foreach ($extensions as $extension) {
+            $cmd = $this->getCmd(null, $_logicalId . $extension);
+		    if (is_object($cmd)) {
+                $cmd->remove();
+            }
+        }
+    }
+
+    // Synchronized the information
+    // @todo: use webhook messages instead to update the information
+    private function syncStrava($_activities) {
+        log::add('strava', 'debug', 'daily activities to process: ' . count($_activities));
+        foreach ($_activities as $activity) {
+            $type  = $activity['type'];
+            $start = strtotime($activity['start_date_local']);
+            if (($this->getConfiguration($type, 0) == 1)
+                and ($start > $this->getConfiguration('last_update', 0))) {
+
+                // This activity is monitored, let's process it !
+                $distance  = round($activity['distance'] / 1000, 2);
+                $elevation = $activity['total_elevation_gain'];
+                $time      = $activity['moving_time'];
+
+                // Weekly update
+                $cmd = $this->getCmd(null, $type . '_count');
+                $this->checkAndUpdate($type . '_count', $cmd->execCmd() + 1);
+                $cmd = $this->getCmd(null, $type . '_distance');
+                $this->checkAndUpdate($type . '_distance', $cmd->execCmd() + $distance);
+                $cmd = $this->getCmd(null, $type . '_elevation');
+                $this->checkAndUpdate($type . '_elevation', $cmd->execCmd() + $elevation);
+                $cmd = $this->getCmd(null, $type . '_time');
+                $this->checkAndUpdate($type . '_time', $cmd->execCmd() + $time);
+
+                // Yearly update
+                $cmd = $this->getCmd(null, $type . '_count_year');
+                $this->checkAndUpdate($type . '_count_year', $cmd->execCmd() + 1);
+                $cmd = $this->getCmd(null, $type . '_distance_year');
+                $this->checkAndUpdate($type . '_distance_year', $cmd->execCmd() + $distance);
+                $cmd = $this->getCmd(null, $type . '_elevation_year');
+                $this->checkAndUpdate($type . '_elevation_year', $cmd->execCmd() + $elevation);
+                $cmd = $this->getCmd(null, $type . '_time_year');
+                $this->checkAndUpdate($type . '_time_year', $cmd->execCmd() + $time);
+
+            }
+        }
+        $this->setConfiguration('last_update', time());
     }
 
     // Fonction exécutée automatiquement après la sauvegarde ecréation ou ma jour) de l'équipement 
     public function postSave() {
-        
+        # weight / read write
+        $cmd = $this->getCmd(null, 'weight');
+		if (!is_object($cmd)) {
+			$cmd = new stravaCmd();
+			$cmd->setLogicalId('weight');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder(1);
+			$cmd->setName(__('Poids', __FILE__));
+			$cmd->setTemplate('dashboard', 'line');
+			$cmd->setTemplate('mobile', 'line');
+		}
+		$cmd->setType('info');
+		$cmd->setSubType('numeric');
+		$cmd->setUnite('kg');
+		$cmd->setEqLogic_id($this->getId());
+	    $cmd->save();
+
+   		$cmd = $this->getCmd(null, 'setWeight');
+		if (!is_object($cmd)) {
+			$cmd = new StravaCmd();
+			$cmd->setLogicalId('setWeight');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Envoyer poids', __FILE__));
+            $cmd->setOrder(2);
+        }
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->setType('action');
+		$cmd->setSubType('numeric');
+        $cmd->save();
+
+        // Create all the sports, that are checked, remove other sports (unchecked)
+        $sports = [
+           'AlpineSki' => __('Ski alpin', __FILE__),
+           'BackcountrySki' => __('Ski de randonnee', __FILE__),
+           'Canoeing' => __('Canoe', __FILE__),
+           'Crossfit' => __('Crossfit', __FILE__), 
+           'EBikeRide' => __('Velo electrique', __FILE__),
+           'Elliptical' => __('Elliptique', __FILE__),
+           'Golf' => __('Golf', __FILE__),
+           'Handcycle' => __('Handbike', __FILE__), 
+           'Hike' => __('Randonnee', __FILE__),
+           'Iceskate' => __('Patinage', __FILE__),
+           'InlineSkate' => __('Roller', __FILE__),
+           'Kayaking' => __('Kayak', __FILE__),
+           'Kitesurf' => __('Kitesurf', __FILE__), 
+           'NordicSki' => __('Ski nordique', __FILE__),
+           'Ride' => __('Velo', __FILE__),
+           'RockClimbing' => __('Escalade', __FILE__),
+           'RollerSki' => __('Ski a roulettes', __FILE__),
+           'Rowing' => __('Aviron', __FILE__),
+           'Run' => __('Course a pied', __FILE__),
+           'Sail' => __('Voile', __FILE__),
+           'Skateboard' => __('Skateboard', __FILE__),
+           'Snowboard' => __('Snowboard', __FILE__),
+           'Snowshoe' => __('Raquettes', __FILE__),
+           'Soccer' => __('Football', __FILE__),
+           'StairStepper' => __('Simulateur d\'escaliers', __FILE__),
+           'StandUpPaddling' => __('Standup paddle', __FILE__),
+           'Surfing' => __('Surf', __FILE__), 
+           'Swim' => __('Natation', __FILE__), 
+           'Velomobile' => __('Velomobile', __FILE__),
+           'VirtualRide' => __('Velo virtuel', __FILE__),
+           'VirtualRun' => __('Course a pied virtuelle', __FILE__),
+           'Walk' => __('Marche', __FILE__),
+           'WeightTraining' => __('Entrainement aux poids', __FILE__),
+           'Wheelchair' => __('Course en fauteuil', __FILE__),
+           'Windsurf' => __('Windsurf', __FILE__),
+           'Workout' => __('Entrainement', __FILE__),
+           'Yoga' => __('Yoga', __FILE__)
+        ];
+        foreach ($sports as $key => $value) {
+            $index = count($this->getCmd()) + 1;
+            if ($this->getConfiguration($key, 0) == 1) {
+                log::add('strava', 'debug', 'Add commands for ' . $key);
+                $this->createCommands($index, $key, $value);
+            } else {
+                log::add('strava', 'debug', 'Remove commands for ' . $key);
+                $this->deleteCommands($key);
+            }
+        }
     }
 
 
@@ -423,13 +759,6 @@ class stravaCmd extends cmd {
 
 
     /*     * *********************Methode d'instance************************* */
-
-    /*
-     * Non obligatoire permet de demander de ne pas supprimer les commandes même si elles ne sont pas dans la nouvelle configuration de l'équipement envoyé en JS
-      public function dontRemoveCmd() {
-      return true;
-      }
-     */
 
      // Exécution d'une commande  
      public function execute($_options = array()) {

@@ -39,7 +39,6 @@ try {
 	    ajax::success(array('redirect' => $eqLogic->connectWithStrava()));
     }
 
-    /*
     if (init('action') === 'disconnectFromStrava') {
         $eqLogic = eqLogic::byId(init('id'));
 	    if (!is_object($eqLogic)) {
@@ -48,7 +47,6 @@ try {
         $eqLogic->disconnectFromStrava();
 	    ajax::success();
     }
-    */
 
     if (init('action') === 'viewSubscription') {
         $eqLogic = eqLogic::byId(init('id'));
@@ -73,6 +71,34 @@ try {
 	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
 	    }
         ajax::success(array('subscriptionId' => $eqLogic->createSubscription()));
+    }
+
+    if (init('action') === 'getAuthenticatedAthlete') {
+        $eqLogic = eqLogic::byId(init('id'));
+	    if (!is_object($eqLogic)) {
+	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	    }
+        $eqLogic->getAuthenticatedAthlete();
+        ajax::success();
+    }
+
+    if (init('action') === 'getAthleteStats') {
+        $eqLogic = eqLogic::byId(init('id'));
+	    if (!is_object($eqLogic)) {
+	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	    }
+        log::add('strava', 'debug', 'BR>> getAthleteStats()');
+        $eqLogic->getAthleteStats();
+        ajax::success();
+    }
+
+    if (init('action') === 'getDailyActivitiesStats') {
+        $eqLogic = eqLogic::byId(init('id'));
+	    if (!is_object($eqLogic)) {
+	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	    }
+        $eqLogic->getDailyActivitiesStats();
+        ajax::success();
     }
 
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));

@@ -60,6 +60,10 @@ class StravaProvider extends AbstractProvider {
         return self::BASE_STRAVA_URL . '/oauth/token';
     }
 
+    public function getBaseApi() {
+        return self::BASE_STRAVA_URL . '/api/' . $this->apiVersion;
+    }
+
     public function getResourceOwnerDetailsUrl(AccessToken $token) {
         return self::BASE_STRAVA_URL . '/api/' . $this->apiVersion . '/athlete';
     }

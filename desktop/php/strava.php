@@ -74,7 +74,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
                     <fieldset>
                         <!-- Partie gauche de l'onglet "Equipements" -->
                         <!-- Paramètres généraux de l'équipement -->
-                        <div class="col-lg-7">
+                        <div class="col-lg-6">
                             <legend><i class="fas fa-wrench"></i> {{Général}}</legend>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{Nom de l'équipement}}</label>
@@ -136,14 +136,29 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-lg-3 control-label">{{Connection Strava}}</label>
-                                <div class="col-lg-4">
+                                <label class="col-sm-3 control-label">{{Connection Strava}}</label>
+                                <div class="col-sm-4">
                                    <img id="bt_connectWithStrava" src="/plugins/strava/desktop/images/btn_strava_connectwith_orange.png" style="max-width:193;max-height:48"/>
                                 </div>
-                                <div class="col-lg-4">
-                                   <a class="btn btn-danger roundedLeft bt_disconnectFromStrava"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{Revoquer}}</span></a>
+                                <div class="col-sm-4">
+                                   <a class="btn roundedLeft bt_disconnectFromStrava" style="background-color: #FC5200">
+                                       <i class="fas fa-cogs"></i>
+                                       <span class="hidden-xs"> {{Revoquer}}</span>
+                                   </a>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{Connection}}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="strava_id" placeholder="{{Strava active}}"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{Webhook}}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="subscription_id" placeholder="{{Webhook active}}"/>
+                                </div>
+                            </div> 
                             <div class="form-group">
                                 <div class="col-lg-2">
                                    <a class="btn btn-warning roundedLeft bt_viewSubscription"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{View Subscription}}</span></a>
@@ -155,23 +170,72 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                    <a class="btn btn-default roundedLeft bt_deleteSubscription"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{Delete Subscription}}</span></a>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <div class="col-lg-2">
+                                   <a class="btn btn-warning roundedLeft bt_getAuthenticatedAthlete"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{GetAuthenticatedAthlete}}</span></a>
+                                </div>
+                                <div class="col-lg-2">
+                                   <a class="btn btn-warning roundedLeft bt_getAthleteStats"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{getAthleteStats}}</span></a>
+                                </div>
+                                <div class="col-lg-2">
+                                   <a class="btn btn-default roundedLeft bt_getDailyActivitiesStats"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{getDailyActivitiesStats}}</span></a>
+                                </div>
+                            </div>
                         </div>
                         <!-- Partie droite de l'onglet "Equipement" -->
-                        <!-- Affiche l'icône du plugin par défaut mais vous pouvez y afficher les informations de votre choix -->
-                        <div class="col-lg-5">
-                            <legend><i class="fas fa-info"></i> {{Informations}}</legend>
+                        <div class="col-lg-6">
+                            <legend><i class="fas fa-info"></i> {{Sports}}</legend>
                             <div class="form-group">
-                                <label class="col-sm-4 control-label">{{Connection Active}}</label>
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="strava_id" placeholder="{{Strava active}}"/>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-4 control-label">{{Webhook Active}}</label>
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="subscription_id" placeholder="{{Webhook active}}"/>
-                            </div> 
-                            <div class="form-group">
-                                <div class="text-center">
-                                    <img name="icon_visu" src="<?= $plugin->getPathImgIcon(); ?>" style="max-width:160px;"/>
-                                </div>
+                            <?php
+
+                                $sports = [
+                                    'Ride' => '{{Velo}}',
+                                    'Run' => '{{Course a pied}}',
+                                    'Swim' => '{{Natation}}',
+                                    'AlpineSki' => '{{Ski alpin}}',
+                                    'BackcountrySki' => '{{Ski de randonnee}}',
+                                    'Canoeing' => '{{Canoe}}',
+                                    'Crossfit' => '{{Crossfit}}',
+                                    'EBikeRide' => '{{Velo electrique}}',
+                                    'Elliptical' => '{{Elliptique}}',
+                                    'Golf' => '{{Golf}}',
+                                    'Handcycle' => '{{Handbike}}',
+                                    'Hike' => '{{Randonnee}}',
+                                    'Iceskate' => '{{Patinage}}',
+                                    'InlineSkate' => '{{Roller}}',
+                                    'Kayaking' => '{{Kayak}}',
+                                    'Kitesurf' => '{{Kitesurf}}',
+                                    'NordicSki' => '{{Ski nordique}}',
+                                    'RockClimbing' => '{{Escalade}}',
+                                    'RollerSki' => '{{Ski a roulettes}}',
+                                    'Rowing' => '{{Aviron}}',
+                                    'Sail' => '{{Voile}}',
+                                    'Skateboard' => '{{Skateboard}}',
+                                    'Snowboard' => '{{Snowboard}}',
+                                    'Snowshoe' => '{{Raquettes}}',
+                                    'Soccer' => '{{Football}}',
+                                    'StairStepper' => '{{Simulateur d\'escaliers}}',
+                                    'StandUpPaddling' => '{{Standup paddle}}',
+                                    'Surfing' => '{{Surf}}',
+                                    'Velomobile' => '{{Velomobile}}',
+                                    'VirtualRide' => '{{Velo virtuel}}',
+                                    'VirtualRun' => '{{Course a pied virtuelle}}',
+                                    'Walk' => '{{Marche}}',
+                                    'WeightTraining' => '{{Entrainement aux poids}}',
+                                    'Wheelchair' => '{{Course en fauteuil}}',
+                                    'Windsurf' => '{{Windsurf}}',
+                                    'Workout' => '{{Entrainement}}',
+                                    'Yoga' => '{{Yoga}}'
+                                ];
+                                foreach ($sports as $key => $value) {
+                                    //echo '<div id ="' . $key . '" class="form-group">';
+                                    echo '   <label class="control-label col-sm-3">' . $value . '</label>';
+					                echo '   <div class="col-sm-1">';
+					                echo '      <input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="' . $key . '"/>';
+					                echo '   </div>';
+					                //echo '</div>';
+                                } 
+                            ?>
                             </div>
                         </div>
                     </fieldset> <!-- fieldset eqlogictab -->
