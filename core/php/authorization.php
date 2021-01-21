@@ -46,6 +46,12 @@ if (!is_object($eqLogic)) {
 	exit();
 }
 
+if (!isConnect()) {
+	echo 'Vous ne pouvez appeller cette page sans être connecté. Veuillez vous connecter <a href=' . network::getNetworkAccess() . '/index.php>ici</a> avant et refaire l\'opération de synchronisation';
+	die();
+}
+
+
 //
 // AUTHORIZATION CALLBACK
 //
@@ -57,10 +63,9 @@ $provider = $eqLogic->getProvider();
 //
 // Check given state against previously stored one to mitigate CSRF attack
 //
-//if (empty($_GET['state']) || (!empty($_SESSION['oauth2state']) and ($_GET['state'] !== $_SESSION['oauth2state']))) {
 if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
 
-    log::add('strava', 'error', '_GET=' . $_GET['state'] . ', _SESSION=' . $_SESSION['oauth2state']);
+    log::add('strava', 'error', 'Invalid session: _GET=' . $_GET['state'] . ', _SESSION=' . $_SESSION['oauth2state']);
 
     unset($_SESSION['oauth2state']);
     exit('Invalid state');
@@ -75,11 +80,10 @@ try {
     ]);
 
     // We have our STRAVA token, so save it for later utilization
+    // as the scope that contained the granted permissions
     $eqLogic->setConfiguration('accessToken', $token->jsonSerialize());
+    $eqLogic->setConfiguration('scope', $_GET['scope']);
     $eqLogic->save();
-
-    // Start fetching information about the user
-    //$eqLogic->getInfoFromStrava();
 
     // Optional: Now you have a token you can look up a users profile data
     try {
@@ -91,9 +95,6 @@ try {
             . $user->getLastName() . '(' . $user->getId() . ') succeed !');
         $eqLogic->setStravaId($user->getId());
 
-        // Create webhook subscription for this user
-        // @todo
-        //$eqLogic->createSubscription(true);
     } catch (Exception $e) {
 
         // Failed to get user details
@@ -101,8 +102,19 @@ try {
         $eqLogic->setStravaId(-1);
         exit($e->getMessage());
     }
+    // Create webhook subscription for this user
+    // delete existing one, if any previous subscription exists
+    try {
+        $eqLogic->createSubscription(true);
+    } catch (Exception $e) {
+        // will try to do it later.
+    } 
+    
     //
-    //
+    // Start fetching information about the user
+    //$eqLogic->getInfoFromStrava();
+
+
     // At the end of the callback, go back to the configuration page of the STRAVA user 
     redirect(network::getNetworkAccess('external') . '/index.php?v=d&p=strava&m=strava&id=' . $eqLogic->getId());
 

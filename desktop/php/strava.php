@@ -162,13 +162,11 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             <legend><i class="fas fa-info"></i> {{Informations}}</legend>
                             <div class="form-group">
                                 <label class="col-sm-4 control-label">{{Connection Active}}</label>
-                                <div class="col-sm-1">oui
-                                </div>
+                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="strava_id" placeholder="{{Strava active}}"/>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-4 control-label">{{Webhook Active}}</label>
-                                <div class="col-sm-1">oui
-                                </div>
+                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="subscription_id" placeholder="{{Webhook active}}"/>
                             </div> 
                             <div class="form-group">
                                 <div class="text-center">

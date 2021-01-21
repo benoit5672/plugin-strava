@@ -313,8 +313,9 @@ class strava extends eqLogic {
            
            // Create a new verify_token, and save it ! 
            $token = config::genKey();
-           $this->setConfiguration('subscription_token', $token);
-           $this->save();
+           //$this->setConfiguration('subscription_token', $token);
+           //$this->save();
+           $this->setCache('subscription_token', $token);
            log::add('strava', 'debug', 'BR>> createSubscription #4 ' . $token);
 
            // and create the subscription, using webhook callback
@@ -328,7 +329,8 @@ class strava extends eqLogic {
 
            log::add('strava', 'debug', 'BR>> createSubscription #5');
            // The subscriptionsToken is no more used, so reset it
-           $this->setConfiguration('subscription_token', '');
+           //$this->setConfiguration('subscription_token', '');
+           $this->setCache('subscription_token', null);
 
            if (!isset($rsp['id'])) {
                log::add('strava', 'error', __('Impossible de creer une souscription STRAVA', __FILE__));
@@ -338,7 +340,9 @@ class strava extends eqLogic {
 
            // Save the subscription information
            $subscriptionId = $rsp['id'];
-           $this->setConfiguration('subcription_id', $subscriptionId);
+           $this->setConfiguration('subscription_id', $subscriptionId);
+           $this->save();
+           
            log::add('strava', 'debug', 'BR>> createSubscription #7');
        }
        log::add('strava', 'debug', 'BR>> createSubscription #8');
@@ -359,6 +363,7 @@ class strava extends eqLogic {
            );
        }
        $this->setConfiguration('subscription_id', -1);
+       $this->save();
     }
 
     //
@@ -374,6 +379,7 @@ class strava extends eqLogic {
            } else {
                $this->setConfiguration('subscription_id', -1);
            }
+           $this->save();
            return $this->getConfiguration('subscription_id');
        } catch (Exception $e) {
            log::add('strava', 'error', $e->getMessage());

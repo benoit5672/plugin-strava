@@ -84,7 +84,7 @@ class StravaProvider extends AbstractProvider {
 
     // see https://strava.github.io/api/v3/oauth/#get-authorize
     protected function getDefaultScopes() {
-        return ['read'];
+        return ['read', 'read_all', 'profile:read_all', 'profile:write', 'activity:read_all'];
     }
 
     protected function checkResponse(ResponseInterface $response, $data) {

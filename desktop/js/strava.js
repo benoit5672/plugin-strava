@@ -205,6 +205,3 @@ $('body').off('click','.bt_createSubscription').on('click','.bt_createSubscripti
 });
 
 
-
-
-
