@@ -143,20 +143,32 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 <div class="col-sm-4">
                                    <a class="btn roundedLeft bt_disconnectFromStrava" style="background-color: #FC5200">
                                        <i class="fas fa-cogs"></i>
-                                       <span class="hidden-xs"> {{Revoquer}}</span>
+                                       <span class="hidden-xs"> {{Revoquer l'acces}}</span>
                                    </a>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{Connection}}</label>
+                                <label class="col-sm-3 control-label">{{API Connection}}</label>
                                 <div class="col-sm-4">
-                                    <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="strava_id" placeholder="{{Strava active}}"/>
+                                    <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="strava_id" style="display : none;"/>
+                                    <span class="stravaConnection"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{Webhook}}</label>
+                                <label class="col-sm-3 control-label">{{API Webhook}}</label>
                                 <div class="col-sm-4">
-                                    <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="subscription_id" placeholder="{{Webhook active}}"/>
+                                    <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="subscription_id" style="display : none;"/>
+                                    <span class="stravaSubscription"/>
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{API Utilisation (15 minutes)}}</label>
+                                <div id="15mUsage" class="col-sm-4 progress-bar" role="progressbar" style="border: 1px solid rgba(0, 0, 0, 1);height:20px;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{API Utilisation (quotidienne)}}</label>
+                                <div id="dayUsage" class="col-sm-4 progress-bar" role="progressbar" style="border: 1px solid rgba(0, 0, 0, 1);height:20px;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                                 </div>
                             </div> 
                             <div class="form-group">

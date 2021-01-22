@@ -48,6 +48,14 @@ try {
 	    ajax::success();
     }
 
+    if (init('action') === 'getUsagesAndLimits') {
+        $eqLogic = eqLogic::byId(init('id'));
+	    if (!is_object($eqLogic)) {
+	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	    }
+        ajax::success($eqLogic->getUsagesAndLimits());
+    }
+
     if (init('action') === 'viewSubscription') {
         $eqLogic = eqLogic::byId(init('id'));
 	    if (!is_object($eqLogic)) {

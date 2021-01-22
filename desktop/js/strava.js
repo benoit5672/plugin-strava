@@ -75,8 +75,80 @@ function addCmdToTable(_cmd) {
 
 
 // benoit5672 code ---
+function updateProgressBar(_bar, _usage, _limit) {
+    
+    var value = 0;
+    var color = 'bg-success';
+    if (_limit != 0) {
+       value = Math.round(_usage / _limit); 
+    } 
+    if (value <= 25) {
+       color = 'bg-success'
+    } else if (value <= 50) {
+       color = 'bg-info'
+    } else if (value <= 75) {
+       color = 'bg-warning'
+    } else if (value <= 100) {
+       color = 'bg-danger'
+    }
+    _bar.className      += color;
+    _bar.style.width     = value + '%;';
+    _bar.ariaValueNow    = _usage;
+    _bar.ariaValueMin    = 0;
+    _bar.ariaValueMax    = _limit;
+    _bar.firstChild.data = _usage + '/' + _limit;
+}
+
 function printEqLogic(_eqLogic) {
-    $('.stravaEqLogicId').empty().append(_eqLogic.id);
+    // Indicate the status of the strava connection (strava_id > 01)
+    var image = document.createElement('i');
+	if ($('.eqLogicAttr[data-l1key=configuration][data-l2key=strava_id').value() > 0) {
+        image.setAttribute('class', 'stravaIdImg icon_green icon techno-plug2');
+    } else {
+        image.setAttribute('class', 'stravaIdImg icon_red icon fas fa-exclamation-triangle');
+    }
+    $('.stravaIdImg').remove();
+    $('.stravaConnection').append(image);
+
+    // Indicate the status of the webhook connection (subscription_id > 0)
+    var image = document.createElement('i');
+	if ($('.eqLogicAttr[data-l1key=configuration][data-l2key=subscription_id').value() > 0) {
+        image.setAttribute('class', 'stravaSubscriptionImg icon_green icon techno-plug2');
+    } else {
+        image.setAttribute('class', 'stravaSubscriptionImg icon_red icon fas fa-exclamation-triangle');
+    }
+    $('.stravaSubscriptionImg').remove();
+    $('.stravaSubscription').append(image);
+
+    // Indicate the number of requests 15 minutes (usage/limit), and daily (usage/limit)
+    $.ajax({
+        type: "POST", 
+        url: "plugins/strava/core/ajax/strava.ajax.php", 
+        data: {
+            action: "getUsagesAndLimits",
+            id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
+        },
+        dataType: 'json',
+        error: function (request, status, error) {
+            handleAjaxError(request, status, error);
+        },
+        success: function (data) {
+            if (data.state != 'ok') {
+                $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                return;
+            }
+            // Fill the two progress bar
+            var bar   = $('#15mUsage')[0];
+            var usage = data.result[1][0];
+            var limit = data.result[0][0];
+            updateProgressBar(bar, usage, limit);
+
+            bar   = $('#dayUsage')[0];
+            usage = data.result[1][1];
+            limit = data.result[0][1];
+            updateProgressBar(bar, usage, limit);
+        }
+    });
 }
 
 
@@ -106,7 +178,6 @@ $('#bt_connectWithStrava').on('click', function () {
 });
 
 
-//$('#bt_disconnectFromStrava').on('click', function () {
 $('body').off('click','.bt_disconnectFromStrava').on('click','.bt_disconnectFromStrava', function () {
     console.log('----> CLICK ON bt_disconnectFromStrava');
     $.ajax({

@@ -26,6 +26,8 @@ use League\OAuth2\Client\Token\AccessToken;
 class strava extends eqLogic {
  
     const BASE_STRAVA_SUBSCRIPTIONS = 'https://www.strava.com/api/v3/push_subscriptions';
+    const API_LIMIT_15M             = 100;
+    const API_LIMIT_DAY             = 1000;
 
     /*     * *************************Attributs****************************** */
     
@@ -55,27 +57,25 @@ class strava extends eqLogic {
 
     /*
      * Fonction exécutée automatiquement toutes les 15 minutes par Jeedom
-      public static function cron15() {
-      }
      */
+    public static function cron15() {
+    	foreach (self::byType(__CLASS__) as $user) {
+            if (is_object($user) && $user->getIsEnable() == 1) {
+                $user->setCache('15mUsage', 0);
+            } 
+        }
+    }
     
-    /*
-     * Fonction exécutée automatiquement toutes les 30 minutes par Jeedom
-      public static function cron30() {
-      }
-     */
-    
-    /*
-     * Fonction exécutée automatiquement toutes les heures par Jeedom
-      public static function cronHourly() {
-      }
-     */
-
     /*
      * Fonction exécutée automatiquement tous les jours par Jeedom
-      public static function cronDaily() {
-      }
      */
+    public static function cronDaily() {
+    	foreach (self::byType(__CLASS__) as $user) {
+           if (is_object($user) && $user->getIsEnable() == 1) {
+               $user->setCache('dayUsage', 0);
+           } 
+        }
+    }
 
 
 
@@ -108,24 +108,56 @@ class strava extends eqLogic {
     //
     private function getRequest($_verb, $_url, $_options = array()) {
         //log::add('strava', 'debug', 'SEND ' . $_verb . ', ' . $_url . ', ' . print_r($_options, true)); 
+        if ($this->getCache('15mUsage', 0) >= $this->getCache('15Limit', self::API_LIMIT_15M)
+            or $this->getCache('dayUsage', 0) >= $this->getCache('dayLimit', self::API_LIMIT_DAY)) {
+            log::add('strava', 'error', __('Limite de requetes atteinte pour la journee ou les 15 dernieres minutes', __FILE__));
+            return [];
+        }
+
+        // Let's process request
         $provider = $this->getProvider();
         try {
+            $this->setCache('15mUsage', $this->getCache('15mUsage') + 1);
+            $this->setCache('dayUsage', $this->getCache('dayUsage') + 1);
             $rsp = $provider->getAuthenticatedRequest(
                 $_verb, 
                 $_url, 
                 $this->getAccessToken(), 
                 $_options);
+
+            // Update our usage counters, available when we are close to our API call limits
+            $limit = $rsp->getHeader('X-Ratelimit-Limit');
+            $usage = $rsp->getHeader('X-Ratelimit-Usage');
+            if (count($limit) > 0 and count($usage) > 0) {
+                $this->setCache('15mLimit', $limit[0]);
+                $this->setCache('dayLimit', $limit[1]);
+                $this->setCache('15mUsage', $usage[0]);
+                $this->setCache('dayUsage', $usage[1]);
+                log::add('strava', 'debug', 'Limits: 15l=' . $limit[0] . ', dl=' . $limit[1] . ', 15u=' . $usage[0] . ', du=' . $usage[1]);
+            }
             return json_decode((string)$provider->getResponse($rsp)->getBody(), true);
         } catch (Exception $e) {
             // just ignore the exception, and retry with a new (refreshed) token
             log::add('strava', 'debug', 'getRequest raised: ' . $e->getMessage());
         }
         // Try again, with a new access token
+        $this->setCache('15mUsage', $this->getCache('15mUsage') + 1);
+        $this->setCache('dayUsage', $this->getCache('dayUsage') + 1);
         $rsp = $provider->getAuthenticatedRequest(
             $_verb, 
             $_url, 
             $this->getAccessToken(true), 
             $_options);
+        
+        // Update our usage counters
+        if (count($limit) > 0 and count($usage) > 0) {
+            $this->setCache('15mLimit', $limit[0]);
+            $this->setCache('dayLimit', $limit[1]);
+            $this->setCache('15mUsage', $usage[0]);
+            $this->setCache('dayUsage', $usage[1]);
+            log::add('strava', 'debug', 'Limits: 15l=' . $limit[0] . ', dl=' . $limit[1] . ', 15u=' . $usage[0] . ', du=' . $usage[1]);
+        }
+
         return json_decode((string)$provider->getResponse($rsp)->getBody(), true);
     }
 
@@ -192,6 +224,17 @@ class strava extends eqLogic {
         return $currentToken;
     }
 
+
+    // 
+    // function to get the current usage and limit
+    // 
+    public function getUsagesAndLimits() {
+        return [
+            [$this->getCache('15mLimit', self::API_LIMIT_15M), $this->getCache('dayLimit', self::API_LIMIT_DAY)],
+            [$this->getCache('15mUsage', 0), $this->getCache('dayUsage', 0)]
+        ];
+    }
+
     // 
     // Set and get StravaId
     //
@@ -237,7 +280,7 @@ class strava extends eqLogic {
     public function getDailyActivitiesStats() {
         $before   = time();
         $after    = strtotime('yesterday'); 
-        $after    = strtotime('Monday this week'); 
+        //$after    = strtotime('Monday this week'); 
         return $this->getActivitiesStats($before, $after);
     }
 
@@ -615,7 +658,7 @@ class strava extends eqLogic {
         log::add('strava', 'debug', 'daily activities to process: ' . count($_activities));
         foreach ($_activities as $activity) {
             $type  = $activity['type'];
-            $start = strtotime($activity['start_date_local']);
+            $start = strtotime($activity['start_date'] + $activity['utc_offset']);
             if (($this->getConfiguration($type, 0) == 1)
                 and ($start > $this->getConfiguration('last_update', 0))) {
 
@@ -736,17 +779,20 @@ class strava extends eqLogic {
 
     // 
     public function preRemove() {
-       // Unsubscribe to STRAVA push notification
-       try {
-          $this->deleteSubscription();
-       } catch(Exception $e) {
-       }
 
-       // Deauthorize the user
-       try {
-          $this->disconnectFromStrava();
-       } catch(Exception $e) {
-       }
+       if ($this->getConfiguration('accessToken') !== '') {
+           // Unsubscribe to STRAVA push notification
+           try {
+              $this->deleteSubscription();
+           } catch(Exception $e) {
+           }
+    
+           // Deauthorize the user
+           try {
+              $this->disconnectFromStrava();
+           } catch(Exception $e) {
+           }
+        }
     }
 
     /*     * **********************Getteur Setteur*************************** */
