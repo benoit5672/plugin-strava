@@ -51,6 +51,7 @@ class strava extends eqLogic {
 		);
 
         // @todo: check strava authorization and strava webhook for all Strava users.
+        // @todo: check API quotas
 		return $return;
 	}
 
@@ -59,9 +60,9 @@ class strava extends eqLogic {
      * Fonction exécutée automatiquement toutes les 15 minutes par Jeedom
      */
     public static function cron15() {
-    	foreach (self::byType(__CLASS__) as $user) {
-            if (is_object($user) && $user->getIsEnable() == 1) {
-                $user->setCache('15mUsage', 0);
+    	foreach (self::byType(__CLASS__) as $eqLogic) {
+            if (is_object($eqLogic) && $eqLogic->getIsEnable() == 1) {
+                $eqLogic->setCache('15mUsage', 0);
             } 
         }
     }
@@ -70,10 +71,21 @@ class strava extends eqLogic {
      * Fonction exécutée automatiquement tous les jours par Jeedom
      */
     public static function cronDaily() {
-    	foreach (self::byType(__CLASS__) as $user) {
-           if (is_object($user) && $user->getIsEnable() == 1) {
-               $user->setCache('dayUsage', 0);
-           } 
+        foreach (self::byType(__CLASS__) as $eqLogic) {
+            if (is_object($eqLogic) && $eqLogic->getIsEnable() == 1) {
+                $eqLogic->setCache('dayUsage', 0);
+
+                // reset counters if this is a new week
+                if (1 == date('w', time())) {
+                    log::add('strava', 'info', __('Reinitialisation des statisques de la semaine', __FILE__));
+                    $eqLogic->resetStats(true, false);
+                } 
+                // reset counters if this is a new year
+                if (strtotime('today GMT') == strtotime('first day of January '.date('Y'). 'GMT')) {
+                    log::add('strava', 'info', __('Reinitialisation des statisques de l\'annee', __FILE__));
+                    $eqLogic->resetStats(false, true);
+                } 
+            } 
         }
     }
 
@@ -242,8 +254,8 @@ class strava extends eqLogic {
         $this->setConfiguration('strava_id', $_id);
     }
 
-    public function getStravaId($_id) {
-        return $this->setConfiguration('strava_id', $_id);
+    public function getStravaId() {
+        return $this->getConfiguration('strava_id', -1);
     }
 
     public function isRegisteredToStrava() {
@@ -253,17 +265,13 @@ class strava extends eqLogic {
 
 
     public function getAthleteStats() {
-        log::add('strava', 'debug', 'BR>> getAthleteStats #1');
         if ($this->isRegisteredToStrava()) {
-            log::add('strava', 'debug', 'BR>> getAthleteStats #2');
             $rsp = $this->getRequest(
                 'GET', 
                 $this->getProvider()->getBaseApi() . '/athletes/' . $this->getConfiguration('strava_id') . '/stats');
-            log::add('strava', 'debug', 'BR>> getAthleteStats #3 (rx:' . print_r($rsp, true) . ')');
         } else {
-            log::add('strava', 'warn', __('Vous n\'etes pas connecte a Strava', __FILE__));
+            log::add('strava', 'warning', __('Vous n\'etes pas connecte a Strava', __FILE__));
         }
-        log::add('strava', 'debug', 'BR>> getAthleteStats #4');
     }
 
     public function getAuthenticatedAthlete() {
@@ -272,15 +280,14 @@ class strava extends eqLogic {
                 'GET', 
                 $this->getProvider()->getBaseApi() . '/athlete');
         } else {
-            log::add('strava', 'warn', __('Vous n\'etes pas connecte a Strava', __FILE__));
+            log::add('strava', 'warning', __('Vous n\'etes pas connecte a Strava', __FILE__));
         }
     }
 
-
+/**
     public function getDailyActivitiesStats() {
         $before   = time();
         $after    = strtotime('yesterday'); 
-        //$after    = strtotime('Monday this week'); 
         return $this->getActivitiesStats($before, $after);
     }
 
@@ -289,8 +296,10 @@ class strava extends eqLogic {
         $after    = strtotime('first day of january'.date('Y'));
         return $this->getActivitiesStats($before, $after);
     }
+*/
 
     private function getActivitiesStats($_before, $_after) {
+        log::add('strava', 'debug', 'getActivitiesStats');
         if ($this->isRegisteredToStrava()) {
             $page       = 1;
             $per_page   = 30;
@@ -310,27 +319,67 @@ class strava extends eqLogic {
                 }
             } 
         } else {
-            log::add('strava', 'warn', __('Vous n\'etes pas connecte a Strava', __FILE__));
+            log::add('strava', 'warning', __('Vous n\'etes pas connecte a Strava', __FILE__));
         }
         log::add('strava', 'debug', 'Return ' . count($activities) . ' activities');
         return $activities;
     }
 
-
-    public function setAthleteWeight() {
+    private function getActivity($_id) {
         if ($this->isRegisteredToStrava()) {
-            $cmd = $this->getCmd(null, 'weight');
-            if (!is_object($cmd)) {
-                log::add('strava', 'error', $this->getHumanName()
-                    . __('Impossible de mettre a jour le poids car la commande n\'existe pas', __FILE__));
-            } else {
-                $rsp = $this->getRequest(
-                    'PUT', 
-                    $this->getProvider()->getBaseApi() . '/athlete?' . $cmd->execCmd());
+            return $rsp = $this->getRequest(
+                   'GET', 
+                    $this->getProvider()->getBaseApi() . '/activities/' . $_id
+                            .'?include_all_effort=false');
+        } 
+        log::add('strava', 'warning', __('Vous n\'etes pas connecte a Strava', __FILE__));
+        return [];
+    }
+
+
+    public function razStatistics() {
+        if ($this->getIsEnable() == 1) {
+            if ($this->getConfiguration('last_update', 0) == 0) {
+                throw new Exception(__('Sauvegarder l\'athlete avant d\'appliquer cette commande', __FILE__));
             }
-        } else {
-            log::add('strava', 'warn', __('Vous n\'etes pas connecte a Strava', __FILE__));
+            if (!$this->isRegisteredToStrava()) {
+                throw new Exception(__('Vous n\'etes pas connecte a Strava', __FILE__));
+            }
+            $this->resetStats(true, true);
+            $this->forceStatsUpdate();
         }
+    }
+
+
+    public function forceStatsUpdate() {
+        if ($this->getIsEnable() == 1) {
+            if ($this->getConfiguration('last_update', 0) == 0) {
+                throw new Exception(__('Sauvegarder l\'athlete avant d\'appliquer cette commande', __FILE__));
+            }
+            if (!$this->isRegisteredToStrava()) {
+                throw new Exception(__('Vous n\'etes pas connecte a Strava', __FILE__));
+            }
+            $activities = $this->getActivitiesStats(time(), $this->getConfiguration('last_update'));
+            $this->syncStats($activities);
+        }
+    }
+
+    public function setAthleteWeight($_weight) {
+        // Execute the commands only if we are enable
+        if ($this->getIsEnable() == 1) {
+            if (!$this->isRegisteredToStrava()) {
+                throw new Exception(__('Vous n\'etes pas connecte a Strava', __FILE__));
+            }
+            // Check that the user granted profile:write scope
+            $scope = $this->getConfiguration('scope');
+            if (strpos($scope, 'profile:write') === false) {
+                throw new Exception(__('Vous n\'avez pas authorise l\'ecriture sur le profile', __FILE__));
+            }
+            $rsp = $this->getRequest(
+                    'PUT', 
+                    $this->getProvider()->getBaseApi() . '/athlete?weight=' . $_weight);
+            $this->checkAndUpdateCmd('weight', $_weight);
+        } 
     }
 
 
@@ -490,12 +539,43 @@ class strava extends eqLogic {
         return ($id !== -1);
     }
 
+    public function processSubscriptionNotification($_notification) {
+        if ($this->getIsEnable() == 1) {
+            if (!$this->isRegisteredToStrava()) {
+                throw new Exception(__('Vous n\'etes pas connecte a Strava', __FILE__));
+            }
+            // Process the notification
+            $action = $_notification['aspect_type'];
+            if (($_notification['owner_id'] == $this->getStravaId()) 
+                and ($_notification['object_type'] === 'activity')
+                and ($action === 'create')) {
+
+                log::add('strava', 'debug', 'Processing notification: object_type: ' 
+                    . $_notification['object_type'] 
+                    . ', owner: ' . $_notification['owner_id'] . ', action=' . $action);
+
+                // Get the activity detail
+                try {
+                    $activity = $this->getActivity($_notification['object_id']);
+                    $this->syncStats([$activity]);
+                } catch (Exception $e) {
+                    log::add('strava', 'warning', $e->getMessage());
+                }
+            } else {
+                log::add('strava', 'debug', 'Notification: action:' . $action
+                    . ' object_type:' . $_notification['object_type'] 
+                    . ', owner: ' . $_notification['owner_id'] 
+                    . ' (our: ' . $this->getStravaId() . ') ignored');
+            } 
+        }
+    }
+
     //
     // Sport Management Section
     //
     private function createCommands($_order, $_logicalId, $_name) {
         // Total (week)
-        log::add('strava', 'debug', 'Create commands for ' . $_logicalId . ', name=' . $_name . ', index=' . $_order);
+        //log::add('strava', 'debug', 'Create commands for ' . $_logicalId . ', name=' . $_name . ', index=' . $_order);
         $cmd = $this->getCmd(null, $_logicalId . '_count');
 		if (!is_object($cmd)) {
 			$cmd = new stravaCmd();
@@ -634,7 +714,7 @@ class strava extends eqLogic {
         }
 		$cmd->setType('info');
 		$cmd->setSubType('numeric');
-		$cmd->setUnite('heures');
+		$cmd->setUnite('s');
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
     }
@@ -652,44 +732,99 @@ class strava extends eqLogic {
         }
     }
 
+
+    private static function endsWith( $str, $sub ) {
+        return ( substr( $str, strlen( $str ) - strlen( $sub ) ) === $sub );
+    }
+
+    // Reinit all values to 0
+    private function resetStats($_week, $_year) {
+
+        $extensions = ['week' => ['_count', '_distance', '_elevation', '_time'],
+                       'year' => ['_count_year', '_distance_year', '_elevation_year', '_time_year']];
+        $cmds       = $this->getCmd();
+        $exts       = [];
+        if ($_week == true) {
+            $exts = array_merge_recursive($exts, $extensions['week']); 
+        }
+        if ($_year == true) {
+            $exts = array_merge_recursive($exts, $extensions['year']); 
+        }
+            
+        foreach ($cmds as $cmd) {
+            $name = $cmd->getLogicalId();
+            foreach ($exts as $extension) {
+                if(strava::endsWith($name, $extension)) {
+                    $this->checkAndUpdateCmd($cmd, 0);
+                    break;
+                }
+            }
+        }
+        $this->setConfiguration('last_update', strtotime('first day of january '.date('Y').' GMT'));
+    }
+
     // Synchronized the information
-    // @todo: use webhook messages instead to update the information
-    private function syncStrava($_activities) {
-        log::add('strava', 'debug', 'daily activities to process: ' . count($_activities));
+    private function syncStats($_activities) {
+        log::add('strava', 'debug', 'Activities to process: ' . count($_activities));
+        $start_of_this_week = strtotime('monday this week GMT');
         foreach ($_activities as $activity) {
             $type  = $activity['type'];
-            $start = strtotime($activity['start_date'] + $activity['utc_offset']);
-            if (($this->getConfiguration($type, 0) == 1)
-                and ($start > $this->getConfiguration('last_update', 0))) {
+            $start = strtotime($activity['start_date']) + $activity['utc_offset'];
+            $last  = $this->getConfiguration('last_update', 0);
+            if (($this->getConfiguration($type, 0) == 1) and ($start > $last)) {
 
                 // This activity is monitored, let's process it !
                 $distance  = round($activity['distance'] / 1000, 2);
                 $elevation = $activity['total_elevation_gain'];
                 $time      = $activity['moving_time'];
 
-                // Weekly update
-                $cmd = $this->getCmd(null, $type . '_count');
-                $this->checkAndUpdate($type . '_count', $cmd->execCmd() + 1);
-                $cmd = $this->getCmd(null, $type . '_distance');
-                $this->checkAndUpdate($type . '_distance', $cmd->execCmd() + $distance);
-                $cmd = $this->getCmd(null, $type . '_elevation');
-                $this->checkAndUpdate($type . '_elevation', $cmd->execCmd() + $elevation);
-                $cmd = $this->getCmd(null, $type . '_time');
-                $this->checkAndUpdate($type . '_time', $cmd->execCmd() + $time);
+                // Weekly Cmd objects
+                $w_c = $this->getCmd(null, $type . '_count');
+                $w_d = $this->getCmd(null, $type . '_distance');
+                $w_e = $this->getCmd(null, $type . '_elevation');
+                $w_t = $this->getCmd(null, $type . '_time');
+                // Yearly Cmd objects
+                $y_c = $this->getCmd(null, $type . '_count_year');
+                $y_d = $this->getCmd(null, $type . '_distance_year');
+                $y_e = $this->getCmd(null, $type . '_elevation_year');
+                $y_t = $this->getCmd(null, $type . '_time_year');
 
-                // Yearly update
-                $cmd = $this->getCmd(null, $type . '_count_year');
-                $this->checkAndUpdate($type . '_count_year', $cmd->execCmd() + 1);
-                $cmd = $this->getCmd(null, $type . '_distance_year');
-                $this->checkAndUpdate($type . '_distance_year', $cmd->execCmd() + $distance);
-                $cmd = $this->getCmd(null, $type . '_elevation_year');
-                $this->checkAndUpdate($type . '_elevation_year', $cmd->execCmd() + $elevation);
-                $cmd = $this->getCmd(null, $type . '_time_year');
-                $this->checkAndUpdate($type . '_time_year', $cmd->execCmd() + $time);
+                // Weekly old values
+                $w_o_c = ($w_c->execCmd() != null) ? $w_c->execCmd() : 0;
+                $w_o_d = ($w_d->execCmd() != null) ? $w_d->execCmd() : 0;
+                $w_o_e = ($w_e->execCmd() != null) ? $w_e->execCmd() : 0;
+                $w_o_t = ($w_t->execCmd() != null) ? $w_t->execCmd() : 0;
+                // Yearly old values
+                $y_o_c = ($y_c->execCmd() != null) ? $y_c->execCmd() : 0;
+                $y_o_d = ($y_d->execCmd() != null) ? $y_d->execCmd() : 0;
+                $y_o_e = ($y_e->execCmd() != null) ? $y_e->execCmd() : 0;
+                $y_o_t = ($y_t->execCmd() != null) ? $y_t->execCmd() : 0;
 
+                // Week
+                if ($start >= $start_of_this_week) {
+                    $this->checkAndUpdateCmd($w_c, ($w_o_c + 1));
+                    $this->checkAndUpdateCmd($w_d, ($w_o_d + $distance));
+                    $this->checkAndUpdateCmd($w_e, ($w_o_e + $elevation));
+                    $this->checkAndUpdateCmd($w_t, ($w_o_t + $time));
+                }
+                // Year
+                $this->checkAndUpdateCmd($y_c, ($y_o_c + 1));
+                $this->checkAndUpdateCmd($y_d, ($y_o_d + $distance));
+                $this->checkAndUpdateCmd($y_e, ($y_o_e + $elevation));
+                $this->checkAndUpdateCmd($y_t, ($y_o_t + $time));
+            } else {
+                log::add('strava', 'debug', 'activity ignored: type: ' . $type);
             }
         }
         $this->setConfiguration('last_update', time());
+    }
+
+    //
+    public function preSave() {
+        // Update last_update
+        if (0 == $this->getConfiguration('last_update', 0)) {
+            $this->setConfiguration('last_update', strtotime('first day of january '.date('Y').' GMT'));
+        }
     }
 
     // Fonction exécutée automatiquement après la sauvegarde ecréation ou ma jour) de l'équipement 
@@ -715,13 +850,13 @@ class strava extends eqLogic {
 		if (!is_object($cmd)) {
 			$cmd = new StravaCmd();
 			$cmd->setLogicalId('setWeight');
-			$cmd->setIsVisible(1);
+			$cmd->setIsVisible(0);
 			$cmd->setName(__('Envoyer poids', __FILE__));
             $cmd->setOrder(2);
         }
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->setType('action');
-		$cmd->setSubType('numeric');
+		$cmd->setSubType('slider');
         $cmd->save();
 
         // Create all the sports, that are checked, remove other sports (unchecked)
@@ -767,13 +902,26 @@ class strava extends eqLogic {
         foreach ($sports as $key => $value) {
             $index = count($this->getCmd()) + 1;
             if ($this->getConfiguration($key, 0) == 1) {
-                log::add('strava', 'debug', 'Add commands for ' . $key);
+                //log::add('strava', 'debug', 'Add commands for ' . $key);
                 $this->createCommands($index, $key, $value);
             } else {
-                log::add('strava', 'debug', 'Remove commands for ' . $key);
+                //log::add('strava', 'debug', 'Remove commands for ' . $key);
                 $this->deleteCommands($key);
             }
         }
+
+        // Refresh action
+		$cmd = $this->getCmd(null, 'refresh');
+		if (!is_object($cmd)) {
+			$cmd = new StravaCmd();
+			$cmd->setLogicalId('refresh');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Rafraîhir', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('other');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
     }
 
 
@@ -808,8 +956,19 @@ class stravaCmd extends cmd {
 
      // Exécution d'une commande  
      public function execute($_options = array()) {
-        
-     }
+        $eqLogic = $this->getEqLogic(); 
+		switch ($this->getLogicalId()) { 
+			case 'refresh': 
+                $eqLogic->forceStatsUpdate();
+                break;
+			case 'setWeight': 
+                if(isset($_options['slider'])) {
+                    $weight = $_options['slider']; 
+                    $eqLogic->setAthleteWeight($weight);
+                }
+                break;
+        }
+	}
 
     /*     * **********************Getteur Setteur*************************** */
 }

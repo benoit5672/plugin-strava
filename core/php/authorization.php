@@ -110,11 +110,6 @@ try {
         // will try to do it later.
     } 
     
-    //
-    // Start fetching information about the user
-    //$eqLogic->getInfoFromStrava();
-
-
     // At the end of the callback, go back to the configuration page of the STRAVA user 
     redirect(network::getNetworkAccess('external') . '/index.php?v=d&p=strava&m=strava&id=' . $eqLogic->getId());
 

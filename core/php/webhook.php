@@ -45,17 +45,25 @@ if (!is_object($eqLogic)) {
 // 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $results = json_decode(file_get_contents('php://input'), true);
-    log::add('strava', 'debug', 'Notification content: ' . print_r($results, true));
+    //log::add('strava', 'debug', 'Notification content: ' . print_r($results, true));
     if (isset($results)) {
 
         // 
         // Process the request, and return 200 OK
         // 
         if (isset($results['subscription_id']) 
-            and $results['subscription_id'] === $eqLogic->getConfiguration('subscription_id')) {
+            and $results['subscription_id'] == $eqLogic->getConfiguration('subscription_id')) {
 
             // Update the eqLogic with the information provided
             log::add('strava', 'debug', 'Received push notification: ' . print_r($results, true));
+            try {
+                $eqLogic->processSubscriptionNotification($results);
+            } catch(Exception $e) {
+                // error processing the notification. 
+                log::add('strava', 'warning', 'Error processing notification: ' . $e->getMessage());
+                http_response_code(500);
+                exit();
+            }
         } else {
             // just ignore the notification
             log::add('strava', 'debug', 'Invalid subscription id (RX=' . $results['subscription_id'] . ' OUR=' . $eqLogic->getConfiguration('subscription_id') . ')');
@@ -71,8 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // GET is used in the case of 'subscribe' challenge 
 // 
 log::add('strava', 'debug', 'REQUEST_METHOD=' . $_SERVER['REQUEST_METHOD'] . 'args=' . print_r($_GET, true));
-//log::add('strava', 'debug', 'BR>>>> token=' . $eqLogic->getConfiguration('subscription_token'));
-log::add('strava', 'debug', 'BR>>>> token=' . $eqLogic->getCache('subscription_token'));
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
    if (isset($_GET['hub_challenge']) and isset($_GET['hub_mode']) and isset($_GET['hub_verify_token'])
        and ($_GET['hub_mode'] == 'subscribe')
@@ -87,11 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
        exit();
    } else {
        log::add('strava', 'error', __("Au moins un parametre hub.mode, hub.verify_token est manquant ou invalide",__FILE__));
-       log::add('strava', 'debug', 'BR>>> hub.mode=' . $_GET['hub_mode']); 
-       log::add('strava', 'debug', 'BR>>> hub.challenge=' . $_GET['hub_challenge']); 
-       log::add('strava', 'debug', 'BR>>> hub.verify_token=' . $_GET['hub_verify_token']);
-       //log::add('strava', 'debug', 'BR>>> eqLogic->token=' . $eqLogic->getConfiguration('subscription_token'));
-       log::add('strava', 'debug', 'BR>>> eqLogic->token=' . $eqLogic->getCache('subscription_token'));
        log::add('strava', 'debug', 'return error 403'); 
        http_response_code(403);
        die();

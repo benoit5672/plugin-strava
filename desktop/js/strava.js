@@ -97,7 +97,15 @@ function updateProgressBar(_bar, _usage, _limit) {
     _bar.ariaValueMin    = 0;
     _bar.ariaValueMax    = _limit;
     _bar.firstChild.data = _usage + '/' + _limit;
-}
+};
+
+function formatDateTime(input){
+       var epoch = new Date(0);
+       epoch.setSeconds(parseInt(input));
+       var date = epoch.toISOString();
+       date = date.replace('T', ' ');
+       return date.split('.')[0].split(' ')[0] + ' ' + epoch.toLocaleTimeString().split(' ')[0];
+};
 
 function printEqLogic(_eqLogic) {
     // Indicate the status of the strava connection (strava_id > 01)
@@ -149,11 +157,14 @@ function printEqLogic(_eqLogic) {
             updateProgressBar(bar, usage, limit);
         }
     });
+
+    // Last update
+	var seconds = $('.eqLogicAttr[data-l1key=configuration][data-l2key=last_update').value();
+    $('.statsLastUpdate').empty().append(formatDateTime(seconds));
 }
 
 
 $('#bt_connectWithStrava').on('click', function () {
-    console.log('----> CLICK ON bt_connectWithStrava');
     $.ajax({
         type: "POST", 
         url: "plugins/strava/core/ajax/strava.ajax.php", 
@@ -170,8 +181,6 @@ $('#bt_connectWithStrava').on('click', function () {
                 $('#div_alert').showAlert({message: data.result, level: 'danger'});
                 return;
             }
-            //$('#div_alert').showAlert({message: 'Vous etes connecte a Strava !', level: 'info'});
-            //await new Promise(r => setTimeout(r, 2000));
             window.location.href = data.result.redirect;
         }
     });
@@ -179,7 +188,6 @@ $('#bt_connectWithStrava').on('click', function () {
 
 
 $('body').off('click','.bt_disconnectFromStrava').on('click','.bt_disconnectFromStrava', function () {
-    console.log('----> CLICK ON bt_disconnectFromStrava');
     $.ajax({
         type: "POST", 
         url: "plugins/strava/core/ajax/strava.ajax.php", 
@@ -195,154 +203,66 @@ $('body').off('click','.bt_disconnectFromStrava').on('click','.bt_disconnectFrom
             if (data.state != 'ok') {
                 $('#div_alert').showAlert({message: data.result, level: 'danger'});
                 return;
-            }
-        }
-    });
-});
-
-
-$('body').off('click','.bt_viewSubscription').on('click','.bt_viewSubscription', function () {
-    console.log('----> CLICK ON bt_viewSubscription');
-    $.ajax({
-        type: "POST", 
-        url: "plugins/strava/core/ajax/strava.ajax.php", 
-        data: {
-            action: "viewSubscription",
-            id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
-        },
-        dataType: 'json',
-        error: function (request, status, error) {
-            handleAjaxError(request, status, error);
-        },
-        success: function (data) {
-            if (data.state != 'ok') {
-                $('#div_alert').showAlert({message: data.result, level: 'danger'});
-                return;
             } else {
-                console.log('id = ' + data.result.subscriptionId);
+                $('#div_alert').showAlert({message: '{{Deconnection de strava reussie}}', level: 'success'});
             }
         }
     });
 });
 
 
-$('body').off('click','.bt_deleteSubscription').on('click','.bt_deleteSubscription', function () {
-    console.log('----> CLICK ON bt_deleteSubscription');
-    $.ajax({
-        type: "POST", 
-        url: "plugins/strava/core/ajax/strava.ajax.php", 
-        data: {
-            action: "deleteSubscription",
-            id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
-        },
-        dataType: 'json',
-        error: function (request, status, error) {
-            handleAjaxError(request, status, error);
-        },
-        success: function (data) {
-            if (data.state != 'ok') {
-                $('#div_alert').showAlert({message: data.result, level: 'danger'});
-                return;
-            } 
+$('body').off('click','.bt_razStatistics').on('click','.bt_razStatistics', function () {
+    bootbox.confirm('{{Etes-vous sur de vouloir supprimer l\'historique des donnees et recharger toutes les donnees depuis Strava ? Assurez-vous d\'avoir selectionne les sports souhaites et d\'avoir sauvegarde l\'athlete}}', function(result) {
+        if (result) {
+            $.ajax({
+                type: "POST", 
+                url: "plugins/strava/core/ajax/strava.ajax.php", 
+                data: {
+                    action: "razStatistics",
+                    id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
+                },
+                dataType: 'json',
+                error: function (request, status, error) {
+                    handleAjaxError(request, status, error);
+                },
+                success: function (data) {
+                    if (data.state != 'ok') {
+                        $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                        return;
+                    } else {
+                        $('#div_alert').showAlert({message: '{{Mise a jour des statisques Strava reussie}}', level: 'success'});
+                    }
+                }
+            });
         }
     });
 });
 
 
-$('body').off('click','.bt_createSubscription').on('click','.bt_createSubscription', function () {
-    console.log('----> CLICK ON bt_createSubscription');
-    $.ajax({
-        type: "POST", 
-        url: "plugins/strava/core/ajax/strava.ajax.php", 
-        data: {
-            action: "createSubscription",
-            id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
-        },
-        dataType: 'json',
-        error: function (request, status, error) {
-            handleAjaxError(request, status, error);
-        },
-        success: function (data) {
-            if (data.state != 'ok') {
-                $('#div_alert').showAlert({message: data.result, level: 'danger'});
-                return;
-            } else {
-                console.log('id = ' + data.result.subscriptionId);
-            }
+$('body').off('click','.bt_forceStatsUpdate').on('click','.bt_forceStatsUpdate', function () {
+    bootbox.confirm('{{Assurez-vous d\'avoir selectionne les sports souhaites et d\'avoir sauvegarde l\'athlete}}', function(result) {
+        if (result) {
+            $.ajax({
+                type: "POST", 
+                url: "plugins/strava/core/ajax/strava.ajax.php", 
+                data: {
+                    action: "forceStatsUpdate",
+                    id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
+                },
+                dataType: 'json',
+                error: function (request, status, error) {
+                    handleAjaxError(request, status, error);
+                },
+                success: function (data) {
+                    if (data.state != 'ok') {
+                        $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                        return;
+                    } else {
+                        $('#div_alert').showAlert({message: '{{Mise a jour des statisques Strava reussie}}', level: 'success'});
+                    }
+                }
+            });
         }
     });
 });
-
-
-/*
-$('body').off('click','.bt_getAuthenticatedAthlete').on('click','.bt_getAuthenticatedAthlete', function () {
-    console.log('----> CLICK ON bt_getAuthenticatedAthlete');
-    $.ajax({
-        type: "POST", 
-        url: "plugins/strava/core/ajax/strava.ajax.php", 
-        data: {
-            action: "getAuthenticatedAthlete",
-            id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
-        },
-        dataType: 'json',
-        error: function (request, status, error) 
-            handleAjaxError(request, status, error);
-        },
-        success: function (data) {
-            if (data.state != 'ok') {
-                $('#div_alert').showAlert({message: data.result, level: 'danger'});
-                return;
-            } 
-        }
-    });
-});
-*/
-
-
-$('body').off('click','.bt_getAthleteStats').on('click','.bt_getAthleteStats', function () {
-    console.log('----> CLICK ON bt_getAthleteStats');
-    $.ajax({
-        type: "POST", 
-        url: "plugins/strava/core/ajax/strava.ajax.php", 
-        data: {
-            action: "getAthleteStats",
-            id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
-        },
-        dataType: 'json',
-        error: function (request, status, error) {
-            handleAjaxError(request, status, error);
-        },
-        success: function (data) {
-            if (data.state != 'ok') {
-                $('#div_alert').showAlert({message: data.result, level: 'danger'});
-                return;
-            } 
-        }
-    });
-});
-
-
-
-$('body').off('click','.bt_getDailyActivitiesStats').on('click','.bt_getDailyActivitiesStats', function () {
-    console.log('----> CLICK ON bt_getDailyActivitiesStats');
-    $.ajax({
-        type: "POST", 
-        url: "plugins/strava/core/ajax/strava.ajax.php", 
-        data: {
-            action: "getDailyActivitiesStats",
-            id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
-        },
-        dataType: 'json',
-        error: function (request, status, error) {
-            handleAjaxError(request, status, error);
-        },
-        success: function (data) {
-            if (data.state != 'ok') {
-                $('#div_alert').showAlert({message: data.result, level: 'danger'});
-                return;
-            } 
-        }
-    });
-});
-
 
