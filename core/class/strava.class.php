@@ -284,20 +284,6 @@ class strava extends eqLogic {
         }
     }
 
-/**
-    public function getDailyActivitiesStats() {
-        $before   = time();
-        $after    = strtotime('yesterday'); 
-        return $this->getActivitiesStats($before, $after);
-    }
-
-    public function getYearlyActivitiesStats() {
-        $before   = time();
-        $after    = strtotime('first day of january'.date('Y'));
-        return $this->getActivitiesStats($before, $after);
-    }
-*/
-
     private function getActivitiesStats($_before, $_after) {
         log::add('strava', 'debug', 'getActivitiesStats');
         if ($this->isRegisteredToStrava()) {
