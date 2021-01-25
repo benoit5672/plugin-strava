@@ -107,7 +107,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             </div>
                             <br>
 
-                            <legend><i class="fas fa-cogs"></i> {{Authorisation Strava}}</legend>
+                            <legend><i class="fas fa-cogs"></i> {{Autorisation Strava}}</legend>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{Client ID}}</label>
                                 <div class="col-sm-7">
