@@ -1,11 +1,33 @@
-# Template de plugin pour Jeedom
+# plugin-strava
 
-Ce "template de plugin" sert de base à la réalisation de plugins pour **Jeedom**.
+# Mentions Legales
 
-La documentation générale relative à la conception de plugin est consultable [ici](https://doc.jeedom.com/fr_FR/dev/). Dans le détail :   
-* [Utilisation du template de plugin](https://doc.jeedom.com/fr_FR/dev/plugin_template) : Le template de plugin est une base de plugin pour Jeedom qui doit être adaptée avec l'id de votre plugin et à laquelle il suffit d'ajouter vos propres fonctions. 
-* [Fichier info.json](https://doc.jeedom.com/fr_FR/dev/structure_info_json) : Intégré depuis la version 3.0 de Jeedom, le fichier **info.json** est obligatoire pour le bon fonctionnement des plugins et leur bon déploiement sur le Market Jeedom.
-* [Icône du plugin](https://doc.jeedom.com/fr_FR/dev/Icone_de_plugin) : Afin de pouvoir être publié sur le Market Jeedom, tout plugin doit disposer d’une icône. Attention à ne pas utiliser le même code couleur que les icônes des plugins Jeedom officiels.
-* [Widget du plugin](https://doc.jeedom.com/fr_FR/dev/widget_plugin) : Présentation des différentes manières d'inclure des widgets personnalisés au plugin.
-* [Documentation du plugin](https://doc.jeedom.com/fr_FR/dev/documentation_plugin) : Présentation de la mise en place d'une documentation car un bon plugin n'est rien sans documentation adéquate.
-* [Publication du plugin](https://doc.jeedom.com/fr_FR/dev/publication_plugin) : Description des pré-requis indispensables à la publication du plugin.
+>Le nom et les logos Strava sont tous protégés par les lois applicables en matière de marques, de droits d'auteur et de propriété intellectuelle.
+Ce plugin n'est pas une application officielle Strava. Il est compatible avec Strava au travers le l'API Strava (see [https://developers.strava.com/](https://developers.strava.com/) )
+
+Le plugin Strava de jeedom a ete developpe de maniere a etre compatible avec Strava.
+![graph1](./docs/assets/images/api_logo_cptblWith_strava_horiz_light.png)
+
+
+***
+
+# Description
+
+Ce plugin permet d'associer Jeedom a Strava, et ainsi recuperer les activitees de l'athlete.
+L'objectif n'est pas de dupliquer les informations contenues dans Strava, mais plutot de recuperer les informations pertinentes des activitees, et de les consolider pour avoir une vue personnalisee.
+
+>Par exemple, Strava propose par defaut un resume hebdomadaire et annuelle pour trois sports : natation, velo, et course a pied. Avec le plugin, il est possible d'avoir ce meme resume pour 37 sports differents !
+
+>![37sports](./docs/assets/images/37sports.png)
+
+Le plugin se base sur l'API Strava, qui propose 2 types de requetes.
+- Les requetes dites 'pull', ou le plugin va chercher les informations dans Strava. 
+- les requetes dites 'push' quand Strava envoie une notification au plugin pour l'informer d'un changement dans Strava. C'est la cas par exemple quand une nouvelle activitees est synchronisee entre votre montre et Strava, apres une belle seance de velo !
+
+Grace a ce plugin, vous serez en temps reel au courant de votre bilan sportif, avec pour chaune des activitees selectionnees:
+- le nombre d'occurence dans la semaine et dans l'annee
+- le cumul des kilometres dans la semaine et dans l'annee
+- le cumul de denivelle positif dans la semaine et dans l'annee
+- le cumul de temps dans la semaine et dans l'annee,
+
+Strava propose egalement un service d'analyse de vos performances, qui prends bien sur en compte votre poids. Au travers du plugin, il est egalement possible de mettre votre poids a jour dans Strava, en utilisant par exemple les informations de votre balance connectee (merci a mmourcia pour l'idee !). 

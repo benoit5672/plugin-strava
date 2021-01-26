@@ -1,15 +1,21 @@
 # Changelog plugin strava
 
->**Mentions Legales**
->
->Le nom et les logos Strava sont tous protégés par les lois applicables en matière de marques, de droits d'auteur et de propriété intellectuelle.
-Ce plugin n'est pas une application officielle Strava. Il est compatible avec Strava au travers le l'API Strava (see https://developers.strava.com/)
 
+>**Mentions Legales**
+
+>Le nom et les logos Strava sont tous protégés par les lois applicables en matière de marques, de droits d'auteur et de propriété intellectuelle.
+Ce plugin n'est pas une application officielle Strava. Il est compatible avec Strava au travers le l'API Strava (see [https://developers.strava.com/](https://developers.strava.com/) )
+
+Le plugin Strava de jeedom a ete developpe de maniere a etre compatible avec Strava.
 ![graph1](../assets/images/api_logo_cptblWith_strava_horiz_light.png)
+
+
 
 >**IMPORTANT**
 >
 >Pour rappel s'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
+
+***
 
 # 25/01/2021
 
