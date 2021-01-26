@@ -233,7 +233,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             <br>
                             <legend><i class="fas fa-wrench"></i> {{Statistiques}}</legend>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label help" data-help="{{dernière mise a jour des statistiques de l'athlète}}">{{Dernière mise à jour}}</label>
+                                <label class="col-sm-3 control-label help" data-help="{{dernière mise à jour des statistiques de l'athlète}}">{{Dernière mise à jour}}</label>
                                 <div class="col-sm-4">
                                     <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="last_update" style="display : none;"/>
                                     <span class="statsLastUpdate"/>
@@ -242,7 +242,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{Mise à jour}}</label>
 		                        <div>
-						           <a class="btn btn-warning tooltips bt_forceStatsUpdate" title="Force la mise à jour des informations de l'athlète depuis le début de l'année."><i class="fas fa-times"></i> Forcer la mise a jour</a>
+						           <a class="btn btn-warning tooltips bt_forceStatsUpdate" title="Force la mise à jour des informations de l'athlète depuis la dernière mise à jour."><i class="fas fa-times"></i> Forcer la mise a jour</a>
                                    <a class="btn btn-danger tooltips bt_razStatistics" title="Recharge toutes les informations de l'athlète depuis le début de l'année."><i class="fas fa-times"></i> RaZ Statistiques</a>
 			                    </div>
                             </div>
