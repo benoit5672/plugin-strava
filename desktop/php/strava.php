@@ -121,13 +121,13 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label help" data-help="{{Domaine a renseigner sur la page Strava 'My API Application'}}">{{Authorization Callback Domain}}</label>
+                                <label class="col-sm-3 control-label help" data-help="{{Domaine à renseigner sur la page Strava 'My API Application'}}">{{Authorization Callback Domain}}</label>
                                 <div class="col-sm-6">
                                     <span>
                                         <?php 
                                             $components = parse_url(network::getNetworkAccess('external'));
                                             if (!isset($components['host'])) {
-                                               echo "Remplisser la partie acces exterieur dans la configuration jeedom";
+                                               echo "Mettez à jour la partie accès extérieur dans la configuration Jeedom";
                                             } else {
                                                echo $components['host'];
                                             } 
@@ -136,14 +136,14 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{Connection Strava}}</label>
+                                <label class="col-sm-3 control-label">{{Connexion Strava}}</label>
                                 <div class="col-sm-4">
                                    <img id="bt_connectWithStrava" src="/plugins/strava/desktop/images/btn_strava_connectwith_orange.png" style="max-width:193;max-height:48"/>
                                 </div>
                                 <div class="col-sm-4">
                                    <a class="btn roundedLeft bt_disconnectFromStrava" style="position:relative;top:+7px;background-color:#FC5200">
                                        <i class="fas fa-cogs"></i>
-                                       <span class="hidden-xs"> {{Revoquer l'acces}}</span>
+                                       <span class="hidden-xs"> {{Révoquer l'accès}}</span>
                                    </a>
                                 </div>
                             </div>
@@ -151,7 +151,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 
                             <legend><i class="fas fa-cogs"></i> {{API Strava}}</legend>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{Connection}}</label>
+                                <label class="col-sm-3 control-label">{{Connexion}}</label>
                                 <div class="col-sm-4">
                                     <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="strava_id" style="display : none;"/>
                                     <span class="stravaConnection"/>
@@ -182,25 +182,25 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             <?php
 
                                 $sports = [
-                                    'Ride' => '{{Velo}}',
-                                    'Run' => '{{Course a pied}}',
+                                    'Ride' => '{{Vélo}}',
+                                    'Run' => '{{Course à pied}}',
                                     'Swim' => '{{Natation}}',
                                     'AlpineSki' => '{{Ski alpin}}',
-                                    'BackcountrySki' => '{{Ski de randonnee}}',
-                                    'Canoeing' => '{{Canoe}}',
+                                    'BackcountrySki' => '{{Ski de randonnée}}',
+                                    'Canoeing' => '{{Canoë}}',
                                     'Crossfit' => '{{Crossfit}}',
-                                    'EBikeRide' => '{{Velo electrique}}',
+                                    'EBikeRide' => '{{Vélo électrique}}',
                                     'Elliptical' => '{{Elliptique}}',
                                     'Golf' => '{{Golf}}',
                                     'Handcycle' => '{{Handbike}}',
-                                    'Hike' => '{{Randonnee}}',
+                                    'Hike' => '{{Randonnée}}',
                                     'Iceskate' => '{{Patinage}}',
                                     'InlineSkate' => '{{Roller}}',
                                     'Kayaking' => '{{Kayak}}',
                                     'Kitesurf' => '{{Kitesurf}}',
                                     'NordicSki' => '{{Ski nordique}}',
                                     'RockClimbing' => '{{Escalade}}',
-                                    'RollerSki' => '{{Ski a roulettes}}',
+                                    'RollerSki' => '{{Ski à roulettes}}',
                                     'Rowing' => '{{Aviron}}',
                                     'Sail' => '{{Voile}}',
                                     'Skateboard' => '{{Skateboard}}',
@@ -210,14 +210,14 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                     'StairStepper' => '{{Simulateur d\'escaliers}}',
                                     'StandUpPaddling' => '{{Standup paddle}}',
                                     'Surfing' => '{{Surf}}',
-                                    'Velomobile' => '{{Velomobile}}',
-                                    'VirtualRide' => '{{Velo virtuel}}',
-                                    'VirtualRun' => '{{Course a pied virtuelle}}',
+                                    'Velomobile' => '{{Vélomobile}}',
+                                    'VirtualRide' => '{{Vélo virtuel}}',
+                                    'VirtualRun' => '{{Course à pied virtuelle}}',
                                     'Walk' => '{{Marche}}',
-                                    'WeightTraining' => '{{Entrainement aux poids}}',
+                                    'WeightTraining' => '{{Entraînement aux poids}}',
                                     'Wheelchair' => '{{Course en fauteuil}}',
                                     'Windsurf' => '{{Windsurf}}',
-                                    'Workout' => '{{Entrainement}}',
+                                    'Workout' => '{{Entraînement}}',
                                     'Yoga' => '{{Yoga}}'
                                 ];
                                 foreach ($sports as $key => $value) {
@@ -233,17 +233,17 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             <br>
                             <legend><i class="fas fa-wrench"></i> {{Statistiques}}</legend>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label help" data-help="{{derniere mise a jour des statistiques de l'athelete}}">{{Derniere mise a jour}}</label>
+                                <label class="col-sm-3 control-label help" data-help="{{dernière mise a jour des statistiques de l'athlète}}">{{Dernière mise à jour}}</label>
                                 <div class="col-sm-4">
                                     <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="last_update" style="display : none;"/>
                                     <span class="statsLastUpdate"/>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{Mise a jour}}</label>
+                                <label class="col-sm-3 control-label">{{Mise à jour}}</label>
 		                        <div>
-						           <a class="btn btn-warning tooltips bt_forceStatsUpdate" title="Force la mise a jour des informations de l'athlete depuis le debut de l'annee."><i class="fas fa-times"></i> Forcer la mise a jour</a>
-                                   <a class="btn btn-danger tooltips bt_razStatistics" title="Recharge toutes les informations de l'athlete depuis le debut de l'annee."><i class="fas fa-times"></i> RaZ Statistiques</a>
+						           <a class="btn btn-warning tooltips bt_forceStatsUpdate" title="Force la mise à jour des informations de l'athlète depuis le début de l'année."><i class="fas fa-times"></i> Forcer la mise a jour</a>
+                                   <a class="btn btn-danger tooltips bt_razStatistics" title="Recharge toutes les informations de l'athlète depuis le début de l'année."><i class="fas fa-times"></i> RaZ Statistiques</a>
 			                    </div>
                             </div>
                         </div>
@@ -262,7 +262,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             <tr>
                                 <th>{{Nom}}</th>
                                 <th>{{Options}}</th>
-                                <th>{{Parametres}}</th>
+                                <th>{{Paramètres}}</th>
                                 <th>{{Action}}</th>
                             </tr>
                         </thead>

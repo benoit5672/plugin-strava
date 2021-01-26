@@ -68,24 +68,6 @@ class StravaProvider extends AbstractProvider {
         return self::BASE_STRAVA_URL . '/api/' . $this->apiVersion . '/athlete';
     }
 
-    /*
-    public function getBaseSubscriptionsUrl() {
-        return self::BASE_STRAVA_URL . '/api/' . $this->apiVersion . '/push_subscriptions';
-    }
-
-    public function getSubscriptionsRequest($_type, $_request, array $_options = []) {
-        //$url = $this->getBaseSubscriptionUrl() . $_request;
-        $url = $_request;
-        $options = [
-            'client_id' => $this->clientId,
-            'client_secret' => $this->clientSecret
-        ];
-		$options = array_merge_recursive($options, $_options);
-        log::add('strava', 'debug', 'SEND SUBSCRIPTION ' . $_type . ', ' . $url . ', options='. print_r($options, true)); 
-        return $this->getRequest($_type, $url, $options);
-    }
-     */
-
     // see https://strava.github.io/api/v3/oauth/#get-authorize
     protected function getDefaultScopes() {
         return ['read', 'read_all', 'profile:read_all', 'profile:write', 'activity:read_all'];

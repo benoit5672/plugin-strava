@@ -23,7 +23,7 @@ log::add('strava', 'debug', 'Received authorization request: ' . $_SERVER['REQUE
 
 include_file('core', 'authentification', 'php');
 if (!jeedom::apiAccess(init('apikey'), 'strava')) {
-	echo 'Clef API non valide, vous n\'êtes pas autorie effectuer cette action';
+	echo 'Clef API non valide, vous n\'êtes pas autorisé effectuer cette action';
 	die();
 }
 
@@ -42,12 +42,12 @@ foreach ($names as $name) {
     $eqLogic = NULL;
 }
 if (!is_object($eqLogic)) {
-	echo 'Impossible de trouver l\'utilisateur Strava correspondant a : ' . init('eqLogic_id');
+	echo 'Impossible de trouver l\'utilisateur Strava correspondant à : ' . init('eqLogic_id');
 	exit();
 }
 
 if (!isConnect()) {
-	echo 'Vous ne pouvez appeller cette page sans être connecté. Veuillez vous connecter <a href=' . network::getNetworkAccess() . '/index.php>ici</a> avant et refaire l\'opération de synchronisation';
+	echo 'Vous ne pouvez appeler cette page sans être connecté. Veuillez vous connecter <a href=' . network::getNetworkAccess() . '/index.php>ici</a> avant et refaire l\'opération de synchronisation';
 	die();
 }
 
@@ -65,7 +65,7 @@ $provider = $eqLogic->getProvider();
 //
 if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
 
-    log::add('strava', 'error', 'Invalid session: _GET=' . $_GET['state'] . ', _SESSION=' . $_SESSION['oauth2state']);
+    log::add('strava', 'error', __('Session invalide : _GET=' . $_GET['state'] . ', _SESSION=' . $_SESSION['oauth2state'], __FILE__));
 
     unset($_SESSION['oauth2state']);
     exit('Invalid state');
@@ -91,8 +91,9 @@ try {
         $user = $provider->getResourceOwner($token);
 
         // Use these details to create a new profile
-        log::add('strava', 'info', 'Authorization of user ' . $user->getFirstName() . ' ' 
-            . $user->getLastName() . '(' . $user->getId() . ') succeed !');
+        log::add('strava', 'info', __('L\'autorisation de l\'utilisateur ', __FILE__) 
+        		. $user->getFirstName() . ' ' . $user->getLastName() . '(' . $user->getId() 
+        		. __(') a réussie !', __FILE__));
         $eqLogic->setStravaId($user->getId());
 
     } catch (Exception $e) {

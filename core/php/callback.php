@@ -3,17 +3,17 @@ require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 
 include_file('core', 'authentification', 'php');
 if (!jeedom::apiAccess(init('apikey'), 'strava')) {
-	echo 'Clef API non valide, vous n\'êtes pas autorie effectuer cette action';
+	echo 'Clef API non valide, vous n\'êtes pas autorisé effectuer cette action';
 	die();
 }
 $eqLogic = eqLogic::byId(init('eqLogic_id'));
 if (!is_object($eqLogic)) {
-	echo 'Impossible de trouver l\'equipement correspondant a : ' . init('eqLogic_id');
+	echo 'Impossible de trouver l\'équipement correspondant à : ' . init('eqLogic_id');
 	exit();
 }
 
 if (!isConnect()) {
-	echo 'Vous ne pouvez pas appeller cette page sans être connecté. Veuillez vous connecter <a href=' . network::getNetworkAccess() . '/index.php>ici</a> avant et refaire l\'opération de synchronisation';
+	echo 'Vous ne pouvez pas appeler cette page sans être connecté. Veuillez vous connecter <a href=' . network::getNetworkAccess() . '/index.php>ici</a> avant et refaire l\'opération de synchronisation';
 	die();
 }
 
@@ -45,23 +45,6 @@ try {
     $eqLogic->setConfiguration('accessToken', $token->jsonSerialize());
     $eqLogic->save();
 
-    // Start fetching information about the user
-    //$eqLogic->getInfoFromStrava();
-
-    // Optional: Now you have a token you can look up a users profile data
-    //try {
-        // We got an access token, let's now get the user's details
-        //$user = $provider->getResourceOwner($token);
-
-        // Use these details to create a new profile
-        //printf('Hello %s!', $user->getFirstName() . ' ' . $user->getLastName());
-    //} catch (Exception $e) {
-
-        // Failed to get user details
-    //    exit('Oh dear...');
-    //}
-    //
-    //
     // At the end of the callback, go back to the configuration page of the STRAVA user 
     redirect(network::getNetworkAccess('external') . '/index.php?v=d&p=strava&m=strava&id=' . $eqLogic->getId());
 

@@ -24,13 +24,13 @@ log::add('strava', 'debug', 'Received webhook notification: ' . $_SERVER['REQUES
 include_file('core', 'authentification', 'php');
 
 if (!jeedom::apiAccess(init('apikey'), 'strava')) {
-    echo 'Clef API non valide, vous n\'etes pas autorise a effectuer cette action';
+    echo 'Clef API non valide, vous n\'êtes pas autorisé à effectuer cette action';
     die();
 }
 
 $eqLogic = eqLogic::byId(init('eqLogic_id'));
 if (!is_object($eqLogic)) {
-    echo 'Impossible de trouver l\'équipement correspondant a : ' . init('eqLogic_id');
+    echo 'Impossible de trouver l\'équipement correspondant à : ' . init('eqLogic_id');
     exit();
 }
 
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $eqLogic->processSubscriptionNotification($results);
             } catch(Exception $e) {
                 // error processing the notification. 
-                log::add('strava', 'warning', 'Error processing notification: ' . $e->getMessage());
+                log::add('strava', 'warning', __('Erreur lors du traitement de la notification: ', __FILE__) . $e->getMessage());
                 http_response_code(500);
                 exit();
             }
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
        http_response_code(200);
        exit();
    } else {
-       log::add('strava', 'error', __("Au moins un parametre hub.mode, hub.verify_token est manquant ou invalide",__FILE__));
+       log::add('strava', 'error', __("Au moins un paramètre hub.mode, hub.verify_token est manquant ou invalide",__FILE__));
        log::add('strava', 'debug', 'return error 403'); 
        http_response_code(403);
        die();
@@ -100,6 +100,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 } 
 
 // Invalid processing, return an error
-log::add('strava', 'error', 'Invalide requete recue sur le webhook Strava'); 
+log::add('strava', 'error', 'Invalide requête reçue sur le webhook Strava'); 
 http_response_code(500);
 

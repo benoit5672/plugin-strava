@@ -205,7 +205,7 @@ $('body').off('click','.bt_disconnectFromStrava').on('click','.bt_disconnectFrom
                 $('#div_alert').showAlert({message: data.result, level: 'danger'});
                 return;
             } else {
-                $('#div_alert').showAlert({message: '{{Deconnection de strava reussie}}', level: 'success'});
+                $('#div_alert').showAlert({message: '{{Déconnexion de Strava réussie}}', level: 'success'});
             }
         }
     });
@@ -213,7 +213,7 @@ $('body').off('click','.bt_disconnectFromStrava').on('click','.bt_disconnectFrom
 
 
 $('body').off('click','.bt_razStatistics').on('click','.bt_razStatistics', function () {
-    bootbox.confirm('{{Etes-vous sur de vouloir supprimer l\'historique des donnees et recharger toutes les donnees depuis Strava ? Assurez-vous d\'avoir selectionne les sports souhaites et d\'avoir sauvegarde l\'athlete}}', function(result) {
+    bootbox.confirm('{{Êtes-vous sur de vouloir supprimer l\'historique des données et recharger toutes les données depuis Strava ? Assurez-vous d\'avoir selectionné les sports souhaites et d\'avoir sauvegardé l\'athlète}}', function(result) {
         if (result) {
             $.ajax({
                 type: "POST", 
@@ -231,7 +231,7 @@ $('body').off('click','.bt_razStatistics').on('click','.bt_razStatistics', funct
                         $('#div_alert').showAlert({message: data.result, level: 'danger'});
                         return;
                     } else {
-                        $('#div_alert').showAlert({message: '{{Mise a jour des statisques Strava reussie}}', level: 'success'});
+                        $('#div_alert').showAlert({message: '{{Mise à jour des statistiques Strava réussie}}', level: 'success'});
                     }
                 }
             });
@@ -241,7 +241,7 @@ $('body').off('click','.bt_razStatistics').on('click','.bt_razStatistics', funct
 
 
 $('body').off('click','.bt_forceStatsUpdate').on('click','.bt_forceStatsUpdate', function () {
-    bootbox.confirm('{{Assurez-vous d\'avoir selectionne les sports souhaites et d\'avoir sauvegarde l\'athlete}}', function(result) {
+    bootbox.confirm('{{Assurez-vous d\'avoir selectionné les sports souhaités et d\'avoir sauvegarde l\'athlète}}', function(result) {
         if (result) {
             $.ajax({
                 type: "POST", 
@@ -259,7 +259,7 @@ $('body').off('click','.bt_forceStatsUpdate').on('click','.bt_forceStatsUpdate',
                         $('#div_alert').showAlert({message: data.result, level: 'danger'});
                         return;
                     } else {
-                        $('#div_alert').showAlert({message: '{{Mise a jour des statisques Strava reussie}}', level: 'success'});
+                        $('#div_alert').showAlert({message: '{{Mise à jour des statistiques Strava réussie}}', level: 'success'});
                     }
                 }
             });

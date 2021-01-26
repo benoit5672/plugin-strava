@@ -77,12 +77,12 @@ class strava extends eqLogic {
 
                 // reset counters if this is a new week
                 if (1 == date('w', time())) {
-                    log::add('strava', 'info', __('Reinitialisation des statisques de la semaine', __FILE__));
+                    log::add('strava', 'info', __('Re-initialisation des statistiques de la semaine', __FILE__));
                     $eqLogic->resetStats(true, false);
                 } 
                 // reset counters if this is a new year
                 if (strtotime('today GMT') == strtotime('first day of January '.date('Y'). 'GMT')) {
-                    log::add('strava', 'info', __('Reinitialisation des statisques de l\'annee', __FILE__));
+                    log::add('strava', 'info', __('Re-initialisation des statistiques de l\'année', __FILE__));
                     $eqLogic->resetStats(false, true);
                 } 
             } 
@@ -122,7 +122,7 @@ class strava extends eqLogic {
         //log::add('strava', 'debug', 'SEND ' . $_verb . ', ' . $_url . ', ' . print_r($_options, true)); 
         if ($this->getCache('15mUsage', 0) >= $this->getCache('15Limit', self::API_LIMIT_15M)
             or $this->getCache('dayUsage', 0) >= $this->getCache('dayLimit', self::API_LIMIT_DAY)) {
-            log::add('strava', 'error', __('Limite de requetes atteinte pour la journee ou les 15 dernieres minutes', __FILE__));
+            log::add('strava', 'error', __('Limite de requêtes atteinte pour la journée ou les 15 dernières minutes', __FILE__));
             return [];
         }
 
@@ -202,8 +202,9 @@ class strava extends eqLogic {
             $this->getRequest('POST', $deauthorizationUrl);
             $this->setConfiguration('strava_id', -1);
             $this->setConfiguration('subscription_id', -1);
+            $this->save();
         } catch (Exception $e) {
-            log::add('strava', 'error', 'Failed to deauthorized user: ' . $e->getMessage());
+            log::add('strava', 'error', __('Impossible de se déconnecter de Strava: : ', __FILE__) . $e->getMessage());
             throw $e;
         }
         
@@ -270,7 +271,7 @@ class strava extends eqLogic {
                 'GET', 
                 $this->getProvider()->getBaseApi() . '/athletes/' . $this->getConfiguration('strava_id') . '/stats');
         } else {
-            log::add('strava', 'warning', __('Vous n\'etes pas connecte a Strava', __FILE__));
+            log::add('strava', 'warning', __('Vous n\'êtes pas connecté à Strava', __FILE__));
         }
     }
 
@@ -280,7 +281,7 @@ class strava extends eqLogic {
                 'GET', 
                 $this->getProvider()->getBaseApi() . '/athlete');
         } else {
-            log::add('strava', 'warning', __('Vous n\'etes pas connecte a Strava', __FILE__));
+            log::add('strava', 'warning', __('Vous n\'êtes pas connecté à Strava', __FILE__));
         }
     }
 
@@ -305,7 +306,7 @@ class strava extends eqLogic {
                 }
             } 
         } else {
-            log::add('strava', 'warning', __('Vous n\'etes pas connecte a Strava', __FILE__));
+            log::add('strava', 'warning', __('Vous n\'etes pas connecté à Strava', __FILE__));
         }
         log::add('strava', 'debug', 'Return ' . count($activities) . ' activities');
         return $activities;
@@ -318,7 +319,7 @@ class strava extends eqLogic {
                     $this->getProvider()->getBaseApi() . '/activities/' . $_id
                             .'?include_all_effort=false');
         } 
-        log::add('strava', 'warning', __('Vous n\'etes pas connecte a Strava', __FILE__));
+        log::add('strava', 'warning', __('Vous n\'etes pas connecté à Strava', __FILE__));
         return [];
     }
 
@@ -326,10 +327,10 @@ class strava extends eqLogic {
     public function razStatistics() {
         if ($this->getIsEnable() == 1) {
             if ($this->getConfiguration('last_update', 0) == 0) {
-                throw new Exception(__('Sauvegarder l\'athlete avant d\'appliquer cette commande', __FILE__));
+                throw new Exception(__('Sauvegarder l\'athlète avant d\'appliquer cette commande', __FILE__));
             }
             if (!$this->isRegisteredToStrava()) {
-                throw new Exception(__('Vous n\'etes pas connecte a Strava', __FILE__));
+                throw new Exception(__('Vous n\'etes pas connecté à Strava', __FILE__));
             }
             $this->resetStats(true, true);
             $this->forceStatsUpdate();
@@ -340,10 +341,10 @@ class strava extends eqLogic {
     public function forceStatsUpdate() {
         if ($this->getIsEnable() == 1) {
             if ($this->getConfiguration('last_update', 0) == 0) {
-                throw new Exception(__('Sauvegarder l\'athlete avant d\'appliquer cette commande', __FILE__));
+                throw new Exception(__('Sauvegarder l\'athlète avant d\'appliquer cette commande', __FILE__));
             }
             if (!$this->isRegisteredToStrava()) {
-                throw new Exception(__('Vous n\'etes pas connecte a Strava', __FILE__));
+                throw new Exception(__('Vous n\'etes pas connecté à Strava', __FILE__));
             }
             $activities = $this->getActivitiesStats(time(), $this->getConfiguration('last_update'));
             $this->syncStats($activities);
@@ -354,12 +355,12 @@ class strava extends eqLogic {
         // Execute the commands only if we are enable
         if ($this->getIsEnable() == 1) {
             if (!$this->isRegisteredToStrava()) {
-                throw new Exception(__('Vous n\'etes pas connecte a Strava', __FILE__));
+                throw new Exception(__('Vous n\'êtes pas connecté à Strava', __FILE__));
             }
             // Check that the user granted profile:write scope
             $scope = $this->getConfiguration('scope');
             if (strpos($scope, 'profile:write') === false) {
-                throw new Exception(__('Vous n\'avez pas authorise l\'ecriture sur le profile', __FILE__));
+                throw new Exception(__('Vous n\'avez pas autorisé l\'écriture sur le profile', __FILE__));
             }
             $rsp = $this->getRequest(
                     'PUT', 
@@ -469,8 +470,8 @@ class strava extends eqLogic {
            $this->setCache('subscription_token', null);
 
            if (!isset($rsp['id'])) {
-               log::add('strava', 'error', __('Impossible de creer une souscription STRAVA', __FILE__));
-               throw new Exception(__('Impossible de creer une souscription STRAVA', __FILE__));
+               log::add('strava', 'error', __('Impossible de créer une souscription STRAVA', __FILE__));
+               throw new Exception(__('Impossible de créer une souscription STRAVA', __FILE__));
            }
 
            // Save the subscription information
@@ -528,7 +529,7 @@ class strava extends eqLogic {
     public function processSubscriptionNotification($_notification) {
         if ($this->getIsEnable() == 1) {
             if (!$this->isRegisteredToStrava()) {
-                throw new Exception(__('Vous n\'etes pas connecte a Strava', __FILE__));
+                throw new Exception(__('Vous n\'etes pas connecté à Strava', __FILE__));
             }
             // Process the notification
             $action = $_notification['aspect_type'];
@@ -603,7 +604,7 @@ class strava extends eqLogic {
 			$cmd->setLogicalId($_logicalId . '_elevation');
 			$cmd->setIsVisible(1);
 			$cmd->setOrder($_order);
-			$cmd->setName($_name . __(' (Denivelle)', __FILE__));
+			$cmd->setName($_name . __(' (Dénivellé)', __FILE__));
 			$cmd->setTemplate('dashboard', 'line');
 			$cmd->setTemplate('mobile', 'line');
             $_order++;
@@ -675,7 +676,7 @@ class strava extends eqLogic {
 			$cmd->setLogicalId($_logicalId . '_elevation_year');
 			$cmd->setIsVisible(1);
 			$cmd->setOrder($_order);
-			$cmd->setName($_name . __(' (Denivelle annuel)', __FILE__));
+			$cmd->setName($_name . __(' (Dénivellé annuel)', __FILE__));
 			$cmd->setTemplate('dashboard', 'line');
 			$cmd->setTemplate('mobile', 'line');
             $_order++;
@@ -747,6 +748,7 @@ class strava extends eqLogic {
             }
         }
         $this->setConfiguration('last_update', strtotime('first day of january '.date('Y').' GMT'));
+        $this->save();
     }
 
     // Synchronized the information
@@ -760,10 +762,19 @@ class strava extends eqLogic {
             if (($this->getConfiguration($type, 0) == 1) and ($start > $last)) {
 
                 // This activity is monitored, let's process it !
-                $distance  = round($activity['distance'] / 1000, 2);
-                $elevation = $activity['total_elevation_gain'];
-                $time      = $activity['moving_time'];
-
+                $distance  = 0;
+                $elevation = 0;
+                $time      = 0;
+                // Load the information, if any
+                if (isset($activity['distance'])) {
+                	$distance = round($activity['distance'] / 1000, 2);
+                }
+                if (isset($activity['total_elevation_gain'])) {
+                	$elevation = $activity['total_elevation_gain'];
+                }
+                if (isset($activity['elapsed_time'])) {
+                	$time = $activity['elapsed_time'];
+                }
                 // Weekly Cmd objects
                 $w_c = $this->getCmd(null, $type . '_count');
                 $w_d = $this->getCmd(null, $type . '_distance');
@@ -803,6 +814,7 @@ class strava extends eqLogic {
             }
         }
         $this->setConfiguration('last_update', time());
+        $this->save();
     }
 
     //
@@ -848,24 +860,24 @@ class strava extends eqLogic {
         // Create all the sports, that are checked, remove other sports (unchecked)
         $sports = [
            'AlpineSki' => __('Ski alpin', __FILE__),
-           'BackcountrySki' => __('Ski de randonnee', __FILE__),
-           'Canoeing' => __('Canoe', __FILE__),
+           'BackcountrySki' => __('Ski de randonnée', __FILE__),
+           'Canoeing' => __('Canoë', __FILE__),
            'Crossfit' => __('Crossfit', __FILE__), 
-           'EBikeRide' => __('Velo electrique', __FILE__),
+           'EBikeRide' => __('Vélo électrique', __FILE__),
            'Elliptical' => __('Elliptique', __FILE__),
            'Golf' => __('Golf', __FILE__),
            'Handcycle' => __('Handbike', __FILE__), 
-           'Hike' => __('Randonnee', __FILE__),
+           'Hike' => __('Randonnée', __FILE__),
            'Iceskate' => __('Patinage', __FILE__),
            'InlineSkate' => __('Roller', __FILE__),
            'Kayaking' => __('Kayak', __FILE__),
            'Kitesurf' => __('Kitesurf', __FILE__), 
            'NordicSki' => __('Ski nordique', __FILE__),
-           'Ride' => __('Velo', __FILE__),
+           'Ride' => __('Vélo', __FILE__),
            'RockClimbing' => __('Escalade', __FILE__),
-           'RollerSki' => __('Ski a roulettes', __FILE__),
+           'RollerSki' => __('Ski à roulettes', __FILE__),
            'Rowing' => __('Aviron', __FILE__),
-           'Run' => __('Course a pied', __FILE__),
+           'Run' => __('Course à pied', __FILE__),
            'Sail' => __('Voile', __FILE__),
            'Skateboard' => __('Skateboard', __FILE__),
            'Snowboard' => __('Snowboard', __FILE__),
@@ -875,14 +887,14 @@ class strava extends eqLogic {
            'StandUpPaddling' => __('Standup paddle', __FILE__),
            'Surfing' => __('Surf', __FILE__), 
            'Swim' => __('Natation', __FILE__), 
-           'Velomobile' => __('Velomobile', __FILE__),
-           'VirtualRide' => __('Velo virtuel', __FILE__),
-           'VirtualRun' => __('Course a pied virtuelle', __FILE__),
+           'Velomobile' => __('Vélomobile', __FILE__),
+           'VirtualRide' => __('Vélo virtuel', __FILE__),
+           'VirtualRun' => __('Course à pied virtuelle', __FILE__),
            'Walk' => __('Marche', __FILE__),
-           'WeightTraining' => __('Entrainement aux poids', __FILE__),
+           'WeightTraining' => __('Entraînement aux poids', __FILE__),
            'Wheelchair' => __('Course en fauteuil', __FILE__),
            'Windsurf' => __('Windsurf', __FILE__),
-           'Workout' => __('Entrainement', __FILE__),
+           'Workout' => __('Entraînement', __FILE__),
            'Yoga' => __('Yoga', __FILE__)
         ];
         foreach ($sports as $key => $value) {
@@ -902,7 +914,7 @@ class strava extends eqLogic {
 			$cmd = new StravaCmd();
 			$cmd->setLogicalId('refresh');
 			$cmd->setIsVisible(1);
-			$cmd->setName(__('Rafraîhir', __FILE__));
+			$cmd->setName(__('Rafraîchir', __FILE__));
 		}
 		$cmd->setType('action');
 		$cmd->setSubType('other');

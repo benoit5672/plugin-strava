@@ -34,7 +34,7 @@ try {
     if (init('action') === 'connectWithStrava') {
         $eqLogic = eqLogic::byId(init('id'));
 	    if (!is_object($eqLogic)) {
-	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	        throw new Exception(__('EqLogic non trouvé : ', __FILE__), init('id'));
 	    }
 	    ajax::success(array('redirect' => $eqLogic->connectWithStrava()));
     }
@@ -42,7 +42,7 @@ try {
     if (init('action') === 'disconnectFromStrava') {
         $eqLogic = eqLogic::byId(init('id'));
 	    if (!is_object($eqLogic)) {
-	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	        throw new Exception(__('EqLogic non trouvé : ', __FILE__), init('id'));
 	    }
         $eqLogic->disconnectFromStrava();
 	    ajax::success();
@@ -51,7 +51,7 @@ try {
     if (init('action') === 'getUsagesAndLimits') {
         $eqLogic = eqLogic::byId(init('id'));
 	    if (!is_object($eqLogic)) {
-	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	        throw new Exception(__('EqLogic non trouvé : ', __FILE__), init('id'));
 	    }
         ajax::success($eqLogic->getUsagesAndLimits());
     }
@@ -59,7 +59,7 @@ try {
     if (init('action') === 'razStatistics') {
         $eqLogic = eqLogic::byId(init('id'));
 	    if (!is_object($eqLogic)) {
-	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	        throw new Exception(__('EqLogic non trouvé : ', __FILE__), init('id'));
 	    }
         $eqLogic->razStatistics();
         ajax::success();
@@ -68,7 +68,7 @@ try {
     if (init('action') === 'forceStatsUpdate') {
         $eqLogic = eqLogic::byId(init('id'));
 	    if (!is_object($eqLogic)) {
-	        throw new Exception(__('EqLogic non trouve : ', __FILE__), init('id'));
+	        throw new Exception(__('EqLogic non trouvé : ', __FILE__), init('id'));
 	    }
         $eqLogic->forceStatsUpdate();
         ajax::success();
