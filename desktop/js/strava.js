@@ -75,6 +75,7 @@ function addCmdToTable(_cmd) {
 
 
 // benoit5672 code ---
+//
 function updateProgressBar(_bar, _usage, _limit) {
     
     var value = 0;
@@ -266,3 +267,7 @@ $('body').off('click','.bt_forceStatsUpdate').on('click','.bt_forceStatsUpdate',
     });
 });
 
+// ---- Thanks @mips: open documentation or community links from the desktop
+$('.pluginAction[data-action=openLocation]').on('click',function(){
+    window.open($(this).attr("data-location"), "_blank", null);
+});

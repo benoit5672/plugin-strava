@@ -164,15 +164,17 @@ Ca veux peut-etre dire qu'il est temps de faire un peu de sport, hein !
 - Si une activitee est modifiee ou supprimee dans Strava, le plugin sera notifie, mais n'est pas en mesure de mettre a jour ses compteurs. En effet, le choix a ete fait de ne pas sauvegarder en base de donnees de jeedom les enregistrements Strava, et il est donc impossible au plugin de connaitre l'evenement concerne par cette notification. 
 - Il n'y a pas pour l'instant de gestion des equipements (chaussures, velos, ...). C'est en projet, mais cela viendra un peu plus tard, apres la stabilisation (beta) du plugin.
 - le widget est ***"moche"***, j'en suis bien conscient, mais les informations sont la. Libre a vous de creer un virtuel, ou un 'customTemplate' permettant d'avoir une visualisation plus jolie par sport, avec icone, des temps qui ne soient pas en secondes, et ....
-Il y a pas mal de personne tres douee dans la communaute pour se genre de tache, avec de la chance, elles sont aussi sportives et interessees par ce plugin.
+Il y a pas mal de personnes tres douees dans la communaute pour se genre de tache, avec de la chance, elles sont aussi sportives et interessees par ce plugin.
 
 # Desinstallation du plugin
 
 Si vous changer d'avis, et que vous souhaitez d'installer le plugin, ou tout simplement supprimer les autorisations entre Jeedom et Strava, vous avez deux possibilitees:
 - il vous suffit de cliquer sur le bouton 'Revoquer l'acces'
+
 ![revoque](../assets/images/autorisation.png)
 
 - ou sur le site de Strava, aller dans Profile->Settings. Selectionner l'application (ici icone jeedom), et cliquer sur le bouton 'Revoke Access'
+
 ![revoquestrava](../assets/images/revokestrava.png)
 
 
