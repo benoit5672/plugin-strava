@@ -121,7 +121,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label help" data-help="{{Domaine à renseigner sur la page Strava 'My API Application'}}">{{Authorization Callback Domain}}</label>
+                                <label class="col-sm-3 control-label help" data-help="{{Domaine à renseigner sur la page Strava 'My API Application'}}">{{Domaine du rappel pour autorisation}}</label>
                                 <div class="col-sm-6">
                                     <span>
                                         <?php 
@@ -221,12 +221,10 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                     'Yoga' => '{{Yoga}}'
                                 ];
                                 foreach ($sports as $key => $value) {
-                                    //echo '<div id ="' . $key . '" class="form-group">';
                                     echo '   <label class="control-label col-sm-3">' . $value . '</label>';
 					                echo '   <div class="col-sm-1">';
 					                echo '      <input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="' . $key . '"/>';
 					                echo '   </div>';
-					                //echo '</div>';
                                 } 
                             ?>
                             </div>
