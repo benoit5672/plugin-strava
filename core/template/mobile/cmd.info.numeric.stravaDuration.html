@@ -1,0 +1,21 @@
+<div class="cmd cmd-widget" data-type="info" data-subtype="numeric" data-template="default" data-version="#version#" data-eqLogic_id="#eqLogic_id#" data-cmd_id="#id#" data-cmd_uid="#uid#">
+	<span class="cmdName #hide_name#">#name_display#</span> <strong class="state">#state#</strong>
+	<script>
+		function pad(num) {
+      		return ("0" + num).slice(-2);
+  		}
+
+      	function formatDuration(_value) {
+        	var seconds = _value;
+    		var minutes = Math.floor(seconds / 60);
+    		seconds     = seconds % 60;
+    		var hours   = Math.floor(minutes / 60);
+    		minutes     = minutes % 60;
+          	return `${hours}:${pad(minutes)}:${pad(seconds)}`;
+		}
+
+		jeedom.cmd.update['#id#'] = function(_options){
+			$('.cmd[data-cmd_id=#id#] .state').empty().append(formatDuration(_options.display_value));
+		}
+	</script>
+</div>

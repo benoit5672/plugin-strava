@@ -1,33 +1,32 @@
-# plugin-strava
 
-# Mentions Legales
+# Mentions Légales
 
->Le nom et les logos Strava sont tous protégés par les lois applicables en matière de marques, de droits d'auteur et de propriété intellectuelle.
-Ce plugin n'est pas une application officielle Strava. Il est compatible avec Strava au travers le l'API Strava (see [https://developers.strava.com/](https://developers.strava.com/) )
+>Le nom et les logos Strava sont tous protégés par les lois applicables en matière de marques, de droits d'auteurs et de propriété intellectuelle.
+Ce plugin n'est pas une application officielle Strava. Il est compatible avec Strava au travers le l'API Strava (voir [https://developers.strava.com/](https://developers.strava.com/) )
 
-Le plugin Strava de jeedom a ete developpe de maniere a etre compatible avec Strava.
-![graph1](./docs/assets/images/api_logo_cptblWith_strava_horiz_light.png)
+Le plugin Strava de Jeedom a été développé de manière à être compatible avec Strava.
+![graph1](../assets/images/api_logo_cptblWith_strava_horiz_light.png)
 
 
 ***
 
 # Description
 
-Ce plugin permet d'associer Jeedom a Strava, et ainsi recuperer les activitees de l'athlete.
-L'objectif n'est pas de dupliquer les informations contenues dans Strava, mais plutot de recuperer les informations pertinentes des activitees, et de les consolider pour avoir une vue personnalisee.
+Ce plugin permet d'associer Jeedom à Strava, et ainsi récupérer les activités de l'athlète.
+L'objectif n'est pas de dupliquer les informations contenues dans Strava, mais plutôt de récupérer les informations pertinentes des activités, et de les consolider pour avoir une vue personnalisée.
 
->Par exemple, Strava propose par defaut un resume hebdomadaire et annuelle pour trois sports : natation, velo, et course a pied. Avec le plugin, il est possible d'avoir ce meme resume pour 37 sports differents !
+>Par exemple, Strava propose par défaut un résumé hebdomadaire et annuelle pour trois sports : natation, vélo, et course à pied. Avec le plugin, il est possible d'avoir ce même résumé pour 37 sports différents !
 
->![37sports](./docs/assets/images/37sports.png)
+>![37sports](../assets/images/37sports.png)
 
-Le plugin se base sur l'API Strava, qui propose 2 types de requetes.
-- Les requetes dites 'pull', ou le plugin va chercher les informations dans Strava. 
-- les requetes dites 'push' quand Strava envoie une notification au plugin pour l'informer d'un changement dans Strava. C'est la cas par exemple quand une nouvelle activitees est synchronisee entre votre montre et Strava, apres une belle seance de velo !
+Le plugin se base sur l'API Strava, qui propose 2 types de requêtes.
+- Les requêtes dites 'pull', ou le plugin va chercher les informations dans Strava.
+- les requêtes dites 'push' quand Strava envoie une notification au plugin pour l'informer d'un changement dans Strava. C'est la cas par exemple quand une nouvelle activité est synchronisée entre votre montre et Strava, après une belle séance de vélo !
 
-Grace a ce plugin, vous serez en temps reel au courant de votre bilan sportif, avec pour chaune des activitees selectionnees:
-- le nombre d'occurence dans la semaine et dans l'annee
-- le cumul des kilometres dans la semaine et dans l'annee
-- le cumul de denivelle positif dans la semaine et dans l'annee
-- le cumul de temps dans la semaine et dans l'annee,
+Grâce à ce plugin, vous serez en temps réel au courant de votre bilan sportif, avec pour chacune des activités sélectionnées:
+- le nombre d’occurrences dans la semaine et dans l'année
+- le cumul des kilomètres dans la semaine et dans l'année
+- le cumul de dénivelé positif dans la semaine et dans l'année
+- le cumul de temps dans la semaine et dans l'année,
 
-Strava propose egalement un service d'analyse de vos performances, qui prends bien sur en compte votre poids. Au travers du plugin, il est egalement possible de mettre votre poids a jour dans Strava, en utilisant par exemple les informations de votre balance connectee (merci a mmourcia pour l'idee !). 
+Strava propose également un service d'analyse de vos performances, qui prends bien sur en compte votre poids. Au travers du plugin, il est également possible de mettre votre poids à jour dans Strava, en utilisant par exemple les informations de votre balance connectée (merci à mmourcia pour l'idée !).
