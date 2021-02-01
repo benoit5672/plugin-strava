@@ -5,6 +5,7 @@
 	"licence" : "AGPL",
 	"author" : "benoit5672",
 	"require" : "4.0",
+	"version": "0.3",
 	"category" : "health",
 	"hasDependency" : false,
 	"hasOwnDeamon" : false,
