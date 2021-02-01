@@ -124,13 +124,13 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 <label class="col-sm-3 control-label help" data-help="{{Domaine à renseigner sur la page Strava 'My API Application'}}">{{Domaine du rappel pour autorisation}}</label>
                                 <div class="col-sm-6">
                                     <span>
-                                        <?php 
+                                        <?php
                                             $components = parse_url(network::getNetworkAccess('external'));
                                             if (!isset($components['host'])) {
                                                echo "Mettez à jour la partie accès extérieur dans la configuration Jeedom";
                                             } else {
                                                echo $components['host'];
-                                            } 
+                                            }
                                         ?>
                                     </span>
                                 </div>
@@ -163,17 +163,17 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                     <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="subscription_id" style="display : none;"/>
                                     <span class="stravaSubscription"/>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{Utilisation (15 minutes)}}</label>
                                 <div id="15mUsage" class="col-sm-4 progress-bar" role="progressbar" style="border: 1px solid rgba(0, 0, 0, 1);height:20px;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                                 </div>
-                            </div> 
+                            </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{Utilisation (quotidienne)}}</label>
                                 <div id="dayUsage" class="col-sm-4 progress-bar" role="progressbar" style="border: 1px solid rgba(0, 0, 0, 1);height:20px;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                                 </div>
-                            </div> 
+                            </div>
                         </div>
                         <!-- Partie droite de l'onglet "Equipement" -->
                         <div class="col-lg-6">
@@ -225,7 +225,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 					                echo '   <div class="col-sm-1">';
 					                echo '      <input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="' . $key . '"/>';
 					                echo '   </div>';
-                                } 
+                                }
                             ?>
                             </div>
                             <br>
@@ -252,7 +252,6 @@ $eqLogics = eqLogic::byType($plugin->getId());
 
             <!-- Onglet des commandes de l'équipement -->
             <div role="tabpanel" class="tab-pane" id="commandtab">
-                <a class="btn btn-default btn-sm pull-right cmdAction" data-action="add" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Ajouter une commande}}</a>
                 <br/><br/>
                 <div class="table-responsive">
                     <table id="table_cmd" class="table table-bordered table-condensed">
