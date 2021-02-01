@@ -85,6 +85,16 @@ class strava extends eqLogic {
                     log::add('strava', 'info', __('Re-initialisation des statistiques de l\'année', __FILE__));
                     $eqLogic->resetStats(false, true);
                 }
+
+                // Get the weight of the user
+                try {
+                    $rsp = getAuthenticatedAthlete();
+                    if (isset($rsp['weight'])) {
+                        $eqLogic->checkAndUpdateCmd('weight', $rsp['weight']);
+                    }
+                } catch (Exception $e) {
+                    log::add('strava', 'error', __('Erreur: ' + $e->getMessage()));
+                }
             }
         }
     }
