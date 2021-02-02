@@ -88,7 +88,7 @@ class strava extends eqLogic {
 
                 // Get the weight of the user
                 try {
-                    $rsp = getAuthenticatedAthlete();
+                    $rsp = $eqLogic->getAuthenticatedAthlete();
                     if (isset($rsp['weight'])) {
                         $eqLogic->checkAndUpdateCmd('weight', $rsp['weight']);
                     }
