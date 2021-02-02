@@ -5,7 +5,7 @@
 Ce plugin n'est pas une application officielle Strava. Il est compatible avec Strava au travers le l'API Strava (voir [https://developers.strava.com/](https://developers.strava.com/) )
 
 Le plugin Strava de Jeedom a été développé de manière à être compatible avec Strava.
-![graph1](../assets/images/api_logo_cptblWith_strava_horiz_light.png)
+![graph1](./docs/assets/images/api_logo_cptblWith_strava_horiz_light.png)
 
 
 ***
@@ -17,7 +17,7 @@ L'objectif n'est pas de dupliquer les informations contenues dans Strava, mais p
 
 >Par exemple, Strava propose par défaut un résumé hebdomadaire et annuelle pour trois sports : natation, vélo, et course à pied. Avec le plugin, il est possible d'avoir ce même résumé pour 37 sports différents !
 
->![37sports](../assets/images/37sports.png)
+>![37sports](./docs/assets/images/37sports.png)
 
 Le plugin se base sur l'API Strava, qui propose 2 types de requêtes.
 - Les requêtes dites 'pull', ou le plugin va chercher les informations dans Strava.
