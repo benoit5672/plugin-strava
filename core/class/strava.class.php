@@ -73,7 +73,7 @@ class strava extends eqLogic {
         // Reset the request counters
     	foreach (self::byType(__CLASS__) as $eqLogic) {
             if (is_object($eqLogic) && $eqLogic->getIsEnable() == 1) {
-                $eqLogic->setCache('15mUsage', 0);
+                self::setStravaQuota('15mUsage', 0);
             }
         }
     }
@@ -84,7 +84,7 @@ class strava extends eqLogic {
     public static function cronDaily() {
         foreach (self::byType(__CLASS__) as $eqLogic) {
             if (is_object($eqLogic) && $eqLogic->getIsEnable() == 1) {
-                $eqLogic->setCache('dayUsage', 0);
+                self::setStravaQuota('dayUsage', 0);
 
                 // reset counters if this is a new week
                 if (1 == date('w', time())) {
@@ -108,6 +108,20 @@ class strava extends eqLogic {
                 }
             }
         }
+    }
+
+    // read the quota for the key. Autorized keys are '15mUsage', '15mLimit' and
+    // 'dayUsage', 'dayLimit'
+    private static function getStravaQuota($_key, $_default = 0) {
+        $plugin = plugin::byId(__CLASS__);
+		$cache  = cache::byKey('eqLogicCacheAttr' . $plugin->getId())->getValue();
+		return utils::getJsonAttr($cache, $_key, $_default);
+	}
+
+    private static function setStravaQuota($_key, $_value) {
+        $plugin = plugin::byId(__CLASS__);
+        cache::set('eqLogicCacheAttr' . $plugin->getId(),
+                   utils::setJsonAttr(cache::byKey('eqLogicCacheAttr' . $plugin->getId())->getValue(), $_key, $_value));
     }
 
 
@@ -141,8 +155,8 @@ class strava extends eqLogic {
     //
     private function getRequest($_verb, $_url, $_options = array()) {
         //log::add('strava', 'debug', 'SEND ' . $_verb . ', ' . $_url . ', ' . print_r($_options, true));
-        if ($this->getCache('15mUsage', 0) >= $this->getCache('15Limit', self::API_LIMIT_15M)
-            or $this->getCache('dayUsage', 0) >= $this->getCache('dayLimit', self::API_LIMIT_DAY)) {
+        if (self::getStravaQuota('15mUsage', 0) >= self::getStravaQuota('15Limit', self::API_LIMIT_15M)
+            or self::getStravaQuota('dayUsage', 0) >= self::getStravaQuota('dayLimit', self::API_LIMIT_DAY)) {
             log::add('strava', 'error', __('Limite de requêtes atteinte pour la journée ou les 15 dernières minutes', __FILE__));
             return [];
         }
@@ -150,8 +164,8 @@ class strava extends eqLogic {
         // Let's process request
         $provider = $this->getProvider();
         try {
-            $this->setCache('15mUsage', $this->getCache('15mUsage') + 1);
-            $this->setCache('dayUsage', $this->getCache('dayUsage') + 1);
+            self::setStravaQuota('15mUsage', self::getStravaQuota('15mUsage') + 1);
+            self::setStravaQuota('dayUsage', self::getStravaQuota('dayUsage') + 1);
             $rsp = $provider->getAuthenticatedRequest(
                 $_verb,
                 $_url,
@@ -162,10 +176,10 @@ class strava extends eqLogic {
             $limit = $rsp->getHeader('X-Ratelimit-Limit');
             $usage = $rsp->getHeader('X-Ratelimit-Usage');
             if (count($limit) > 0 and count($usage) > 0) {
-                $this->setCache('15mLimit', $limit[0]);
-                $this->setCache('dayLimit', $limit[1]);
-                $this->setCache('15mUsage', $usage[0]);
-                $this->setCache('dayUsage', $usage[1]);
+                self::setStravaQuota('15mLimit', $limit[0]);
+                self::setStravaQuota('dayLimit', $limit[1]);
+                self::setStravaQuota('15mUsage', $usage[0]);
+                self::setStravaQuota('dayUsage', $usage[1]);
                 log::add('strava', 'debug', 'Limits: 15l=' . $limit[0] . ', dl=' . $limit[1] . ', 15u=' . $usage[0] . ', du=' . $usage[1]);
             }
             return json_decode((string)$provider->getResponse($rsp)->getBody(), true);
@@ -174,8 +188,8 @@ class strava extends eqLogic {
             log::add('strava', 'debug', 'getRequest raised: ' . $e->getMessage());
         }
         // Try again, with a new access token
-        $this->setCache('15mUsage', $this->getCache('15mUsage') + 1);
-        $this->setCache('dayUsage', $this->getCache('dayUsage') + 1);
+        self::setStravaQuota('15mUsage', self::getStravaQuota('15mUsage') + 1);
+        self::setStravaQuota('dayUsage', self::getStravaQuota('dayUsage') + 1);
         $rsp = $provider->getAuthenticatedRequest(
             $_verb,
             $_url,
@@ -184,10 +198,10 @@ class strava extends eqLogic {
 
         // Update our usage counters
         if (count($limit) > 0 and count($usage) > 0) {
-            $this->setCache('15mLimit', $limit[0]);
-            $this->setCache('dayLimit', $limit[1]);
-            $this->setCache('15mUsage', $usage[0]);
-            $this->setCache('dayUsage', $usage[1]);
+            self::setStravaQuota('15mLimit', $limit[0]);
+            self::setStravaQuota('dayLimit', $limit[1]);
+            self::setStravaQuota('15mUsage', $usage[0]);
+            self::setStravaQuota('dayUsage', $usage[1]);
             log::add('strava', 'debug', 'Limits: 15l=' . $limit[0] . ', dl=' . $limit[1] . ', 15u=' . $usage[0] . ', du=' . $usage[1]);
         }
 
@@ -260,8 +274,8 @@ class strava extends eqLogic {
     //
     public function getUsagesAndLimits() {
         return [
-            [$this->getCache('15mLimit', self::API_LIMIT_15M), $this->getCache('dayLimit', self::API_LIMIT_DAY)],
-            [$this->getCache('15mUsage', 0), $this->getCache('dayUsage', 0)]
+            [self::getStravaQuota('15mLimit', self::API_LIMIT_15M), self::getStravaQuota('dayLimit', self::API_LIMIT_DAY)],
+            [self::getStravaQuota('15mUsage', 0), self::getStravaQuota('dayUsage', 0)]
         ];
     }
 
