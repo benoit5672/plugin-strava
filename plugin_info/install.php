@@ -20,14 +20,14 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
   function createDB() {
       // Create the table with all the monitored sports
-      $sql = 'CREATE TABLE IF NOT EXISTS `stravaType` ('
+      $sql = 'CREATE TABLE IF NOT EXISTS `stravaSport` ('
              . '`type` TINYINT UNSIGNED UNIQUE NOT NULL,'
              . '`name` VARCHAR(32) NOT NULL'
              . ') ENGINE=InnoDB DEFAULT CHARSET=utf8;';
       DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
 
       // Populate the stravaTypeDB
-      $sql = 'INSERT IGNORE INTO `stravaType` (`type`, `name`) VALUES'
+      $sql = 'INSERT IGNORE INTO `stravaSport` (`type`, `name`) VALUES'
                 . '(1, "AlpineSki"), (2, "BackcountrySki"), (3, "Canoeing"), '
                 . '(4, "Crossfit"), (5, "EBikeRide"), (6, "Elliptical"), '
                 . '(7, "Golf"), (8, "Handcycle"), (9, "Hike"), (10, "Iceskate"), '
@@ -45,7 +45,7 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
       // Create the table where the activities are stored
       $sql = 'CREATE TABLE IF NOT EXISTS `stravaActivity` ('
              . '`eqLogicId` INT(11) NOT NULL,'
-             . '`stravaId` BIGINT UNSIGNED NOT NULL,'
+             . '`stravaId` BIGINT UNSIGNED UNIQUE NOT NULL,'
              . '`time` INT UNSIGNED NOT NULL,'
              . '`type` TINYINT UNSIGNED NOT NULL,'
              . '`distance` FLOAT UNSIGNED NOT NULL,'
@@ -68,8 +68,8 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
   // Fonction exécutée automatiquement après la suppression du plugin
   function strava_remove() {
       // drop the table where the activities are stored
-      DB::Prepare('DROP TABLE IF EXISTS `stravaActivityDB`;', array(), DB::FETCH_TYPE_ROW);
-      DB::Prepare('DROP TABLE IF EXISTS `stravaTypeDB`;', array(), DB::FETCH_TYPE_ROW);
+      DB::Prepare('DROP TABLE IF EXISTS `stravaActivity`;', array(), DB::FETCH_TYPE_ROW);
+      DB::Prepare('DROP TABLE IF EXISTS `stravaSport`;', array(), DB::FETCH_TYPE_ROW);
   }
 
 ?>

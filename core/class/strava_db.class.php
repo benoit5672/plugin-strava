@@ -89,11 +89,11 @@ class stravaActivity {
             'start'     => $_start,
             'end'       => $_end,
 		);
-        $sql = 'SELECT eqLogicId, stravaId, time, type, distance, duration, elevation
-                FROM `stravaActivity`
-                WHERE `eqLogicId` = :eqLogicId AND `time` >= :start AND `time` <= :end
-                GROUP BY time
-                ORDER BY eqLogicId, time;';
+        $sql = 'SELECT eqLogicId, stravaId, time, name, distance, duration, elevation
+				FROM `stravaActivity` activity, `stravaSport` sport
+				WHERE `eqLogicId` = :$eqLogicId AND `time` >= :start AND `time` <= :end
+				 	AND activity.type = sport.type
+				GROUP BY time ORDER BY eqLogicId, time;';
 		return DB::Prepare($sql, $parameters, DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
     }
 
@@ -112,6 +112,7 @@ class stravaActivity {
                 WHERE `eqLogicId` = :eqLogicId;';
 		return DB::Prepare($sql, $parameters, DB::FETCH_TYPE_ROW);
 	}
+
     /**
      * Remove all the activities older than the specified date for
      * eqLogic specified
@@ -159,8 +160,6 @@ class stravaActivity {
 				$_duration,
 				$_elevation) {
 
-		log::add('strava', 'debug', 'createActivity');
-
 	    $parameters = array (
 			'eqLogicId' => $_eqLogicId,
 			'stravaId'  => $_stravaId,
@@ -169,8 +168,6 @@ class stravaActivity {
 			'distance'  => $_distance,
 			'duration' => $_duration,
 			'elevation'  => $_elevation);
-
-		log::add('strava', 'debug', 'createActivity type' . $_type . ' => ' . $parameters['type']);
 
 		$sql = 'INSERT IGNORE INTO `stravaActivity` SET
 		        `eqLogicId` = :eqLogicId, `stravaId` = :stravaId,

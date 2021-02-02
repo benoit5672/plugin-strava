@@ -569,9 +569,20 @@ class strava extends eqLogic {
                         log::add('strava', 'warning', $e->getMessage());
                     }
                 } else if ($action === 'delete') {
-                    // Delete the activity
+                    // Delete the activity and reload the information from the database
                     try {
                         stravaActivity::deleteActivity($this->getId(), $_notification['object_id']);
+                        $this->refresh();
+                    } catch (Exception $e) {
+                        log::add('strava', 'warning', $e->getMessage());
+                    }
+                } else if ($action === 'update') {
+                    // Delete the activity, fetch the activity and re-create the activity
+                    try {
+                        $activity = $this->getActivity($_notification['object_id']);
+                        stravaActivity::deleteActivity($this->getId(), $_notification['object_id']);
+                        $this->storeActivity([$activity]);
+                        $this->refresh();
                     } catch (Exception $e) {
                         log::add('strava', 'warning', $e->getMessage());
                     }
@@ -990,7 +1001,9 @@ class strava extends eqLogic {
     }
 
 
-    //
+    // Call before the object is remove.
+    // in this context, delete the Strava subscription, strava connection
+    // and all information from the database
     public function preRemove() {
 
        if ($this->getConfiguration('accessToken') !== '') {
@@ -1003,6 +1016,12 @@ class strava extends eqLogic {
            // Deauthorize the user
            try {
               $this->disconnectFromStrava();
+           } catch(Exception $e) {
+           }
+
+           // Clear the information in the database
+           try {
+               stravaActivity::removeAllbyId($this->getId());
            } catch(Exception $e) {
            }
         }
