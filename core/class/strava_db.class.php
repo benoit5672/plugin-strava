@@ -117,7 +117,7 @@ class stravaActivity {
      * Remove all the activities older than the specified date for
      * eqLogic specified
      */
-    public static function removeAllByIdtime($_eqLogicId, $_time) {
+    public static function removeAllByIdTime($_eqLogicId, $_time) {
 
         $parameters = array (
             'eqLogicId' => $_eqLogicId,
@@ -130,23 +130,21 @@ class stravaActivity {
 
     /**
      * Remove all the activities that don't have pending eqLogic object
-	 * @todo
      */
-	 /*
     public static function removeDeadActivities() {
-        $sql = 'SELECT eqLogicId, stravaId, time, type, distance, duration, elevation
+        $sql = 'SELECT eqLogicId, 0 as stravaId, 0 AS time, 0 AS type, 0 AS distance, 0 AS duration, 0 AS elevation
 				FROM `stravaActivity`
             	WHERE `eqLogicId` NOT IN
             	(SELECT id FROM `eqLogic` WHERE eqLogicId = id and `eqType_name` = "strava");';
 		$values =  DB::Prepare($sql, array(), DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
         foreach ($values as $value) {
             log::add('strava', 'info',
-                __('Suppression des evenements "dead" pour l\'id', __FILE__)
+                __('Suppression des événements "dead" pour l\'id', __FILE__)
                 . $value->getEqLogicId());
             self::removeAllbyId($value->getEqLogicId());
         }
     }
-	*/
+
 
     /**
      * Create a new stravaActivity according to the specified parameters
@@ -211,7 +209,7 @@ class stravaActivity {
 		return $this->eqLogicId;
 	}
 
-    public function gettime() {
+    public function getTime() {
         return $this->time;
     }
 

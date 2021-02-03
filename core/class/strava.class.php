@@ -60,8 +60,11 @@ class strava extends eqLogic {
      */
     public static function start() {
         foreach (eqLogic::byType(__CLASS__, true) as $eqLogic) {
-            if (is_object($eqLogic) && $eqLogic->getIsEnable() == 1) {
-                $eqLogic->loadHeatmap();
+            if (is_object($eqLogic)) {
+                // Retrieve the latest information
+                if ($eqLogic->isRegisteredToStrava()) {
+                    $eqLogic->forceStatsUpdate();
+                }
             }
         }
     }
@@ -71,9 +74,12 @@ class strava extends eqLogic {
      */
     public static function cron15() {
         // Reset the request counters
-    	foreach (self::byType(__CLASS__) as $eqLogic) {
-            if (is_object($eqLogic) && $eqLogic->getIsEnable() == 1) {
-                self::setStravaQuota('15mUsage', 0);
+        self::setStravaQuota('15mUsage', 0);
+
+        // Process the notitifications queue
+        foreach (self::byType(__CLASS__, true) as $eqLogic) {
+            if (is_object($eqLogic)) {
+                $eqLogic->dequeueNotifications();
             }
         }
     }
@@ -82,9 +88,12 @@ class strava extends eqLogic {
      * Fonction exécutée automatiquement tous les jours par Jeedom
      */
     public static function cronDaily() {
-        foreach (self::byType(__CLASS__) as $eqLogic) {
-            if (is_object($eqLogic) && $eqLogic->getIsEnable() == 1) {
-                self::setStravaQuota('dayUsage', 0);
+        // Reset the daily quota
+        self::setStravaQuota('dayUsage', 0);
+
+        // only the 'strava' object that are enabled
+        foreach (self::byType(__CLASS__, true) as $eqLogic) {
+            if (is_object($eqLogic)) {
 
                 // reset counters if this is a new week
                 if (1 == date('w', time())) {
@@ -96,6 +105,9 @@ class strava extends eqLogic {
                     log::add('strava', 'info', __('Re-initialisation des statistiques de l\'année', __FILE__));
                     $eqLogic->resetStats(false, true);
                 }
+
+                // Remove old activities from DB
+                $eqLogic->removeOldActivities();
 
                 // Get the weight of the user
                 try {
@@ -558,6 +570,14 @@ class strava extends eqLogic {
         return ($id !== -1);
     }
 
+    /*
+     * function called by the callback function, that is to say when a notification
+     * is pushed from Strava. We need to answer with 2seconds, otherwise we will
+     * have retransmission from Strava.
+     * With the (insert/delete/update) in the database, it takes to much time.
+     * We will use a queue with (action => activity) entry that will be processed
+     * by the 15m cron.
+     */
     public function processSubscriptionNotification($_notification) {
         if ($this->getIsEnable() == 1) {
             if (!$this->isRegisteredToStrava()) {
@@ -568,39 +588,11 @@ class strava extends eqLogic {
             if (($_notification['owner_id'] == $this->getStravaId())
                 and ($_notification['object_type'] === 'activity')) {
 
-                log::add('strava', 'debug', 'Processing notification: object_type: '
+                log::add('strava', 'debug', 'Enqueuing notification: object_type: '
                     . $_notification['object_type']
                     . ', owner: ' . $_notification['owner_id'] . ', action=' . $action);
 
-                if ($action === 'create') {
-
-                    // Get the activity detail
-                    try {
-                        $activity = $this->getActivity($_notification['object_id']);
-                        $this->syncStats([$activity]);
-                        $this->storeActivity([$activity]);
-                    } catch (Exception $e) {
-                        log::add('strava', 'warning', $e->getMessage());
-                    }
-                } else if ($action === 'delete') {
-                    // Delete the activity and reload the information from the database
-                    try {
-                        stravaActivity::deleteActivity($this->getId(), $_notification['object_id']);
-                        $this->refresh();
-                    } catch (Exception $e) {
-                        log::add('strava', 'warning', $e->getMessage());
-                    }
-                } else if ($action === 'update') {
-                    // Delete the activity, fetch the activity and re-create the activity
-                    try {
-                        $activity = $this->getActivity($_notification['object_id']);
-                        stravaActivity::deleteActivity($this->getId(), $_notification['object_id']);
-                        $this->storeActivity([$activity]);
-                        $this->refresh();
-                    } catch (Exception $e) {
-                        log::add('strava', 'warning', $e->getMessage());
-                    }
-                }
+                $this->enqueueNotification($action, $_notification['object_id']);
             } else {
                 log::add('strava', 'debug', 'Notification: action:' . $action
                     . ' object_type:' . $_notification['object_type']
@@ -863,11 +855,72 @@ class strava extends eqLogic {
                 $this->checkAndUpdateCmd($y_e, ($y_o_e + $elevation));
                 $this->checkAndUpdateCmd($y_t, ($y_o_t + $time));
             } else {
-                log::add('strava', 'debug', 'activity ignored: type: ' . $type);
+                log::add('strava', 'debug', 'activity ignored: type: ' . $type
+                            . ', time: ' . $start . 'last: '. $last);
             }
         }
         $this->setConfiguration('last_update', time());
         $this->save();
+    }
+
+    // Enqueue notifications action
+    private function enqueueNotification($_action, $_object_id) {
+        $queue           = new SplQueue();
+        $serializedQueue = $this->getConfiguration('dbQueue', '');
+        if ($serializedQueue!=='') {
+            $queue->unserialize($serializedQueue);
+        }
+        $queue->enqueue(['action' => $_action, 'object_id' => $_object_id]);
+        $this->setConfiguration('dbQueue', $queue->serialize());
+        $this->save(true);
+    }
+
+    private function dequeueNotifications() {
+        try {
+            $serializedQueue = $this->getConfiguration('dbQueue');
+            $this->setConfiguration('dbQueue', '');
+            $this->save(true);
+			$queue = new SplQueue();
+			$queue->unserialize($serializedQueue);
+			if ($queue->isEmpty()) {
+				log::add('strava', 'debug', 'message dbQueue is empty');
+				return;
+			}
+		} catch (\Throwable $th) {
+			log::add('strava', 'error', 'Error during unserialize dbQueue');
+			return;
+		}
+        $needRefresh = false;
+        while (!$queue->isEmpty()) {
+			$notification = $queue->dequeue();
+            $action       = $notification['action'];
+            $object_id    = $notification['object_id'];
+            try {
+                if ($action === 'create') {
+                    // Get the activity detail
+                    $activity = $this->getActivity($object_id);
+                    log::add('strava', 'info', 'Notification: création de l\'activitée  : ' . $object_id);
+                    $this->syncStats([$activity]);
+                } else if ($action === 'delete') {
+                    // Delete the activity and reload the information from the database
+                    log::add('strava', 'info', 'Notification: suppression de l\'activitée : ' . $object_id);
+                    stravaActivity::deleteActivity($this->getId(), $object_id);
+                    $needRefresh = true;
+                } else if ($action === 'update') {
+                    // Delete the activity, fetch the activity and re-create the activity
+                    log::add('strava', 'info', 'Notification: mise à jour de l\'activitée : ' . $object_id);
+                    $activity = $this->getActivity($object_id);
+                    stravaActivity::deleteActivity($this->getId(), $object_id);
+                    $this->storeActivity([$activity]);
+                    $needRefresh = true;
+                }
+            } catch (Exception $e) {
+                log::add('strava', 'warning', $e->getMessage());
+            }
+        }
+        if ($needRefresh === true) {
+            $this->refresh();
+        }
     }
 
     // Store the activities in the database
@@ -887,6 +940,23 @@ class strava extends eqLogic {
             );
         }
     }
+
+    /**
+     * Remove the events that have been inserted before the retention
+     * date
+     */
+    private function removeOldActivities() {
+        $retention = $this->getConfiguration('retention', 0);
+        if ($retention != 0) {
+            $after     = date("m/d/Y", mktime(0, 0, 0, date("m") - $retention, date("d"), date("y")));
+
+            log::add('strava', 'info', $this->getHumanName()
+                . __(': suppression des événements anterieurs à ', __FILE__) . $after);
+
+            stravaActivity::removeAllByIdTime($this->getId(), strtotime($after));
+        }
+    }
+
 
     // refresh
     public function refresh() {
