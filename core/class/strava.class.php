@@ -901,6 +901,7 @@ class strava extends eqLogic {
                     $activity = $this->getActivity($object_id);
                     log::add('strava', 'info', 'Notification: création de l\'activitée  : ' . $object_id);
                     $this->syncStats([$activity]);
+                    $this->storeActivities([$activity]);
                 } else if ($action === 'delete') {
                     // Delete the activity and reload the information from the database
                     log::add('strava', 'info', 'Notification: suppression de l\'activitée : ' . $object_id);
@@ -911,7 +912,7 @@ class strava extends eqLogic {
                     log::add('strava', 'info', 'Notification: mise à jour de l\'activitée : ' . $object_id);
                     $activity = $this->getActivity($object_id);
                     stravaActivity::deleteActivity($this->getId(), $object_id);
-                    $this->storeActivity([$activity]);
+                    $this->storeActivities([$activity]);
                     $needRefresh = true;
                 }
             } catch (Exception $e) {
