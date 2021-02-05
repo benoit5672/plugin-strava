@@ -966,8 +966,8 @@ class strava extends eqLogic {
                 $this->getId(),
                 strtotime('first day of january '.date('Y').' GMT'),
                 time());
-        resetStats(true, true);
-        syncStats($activities);
+        $this->resetStats(true, true);
+        $this->syncStats($activities);
     }
 
     //
