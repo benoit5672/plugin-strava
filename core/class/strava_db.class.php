@@ -82,16 +82,16 @@ class stravaActivity {
      * Return an array of elements for the specified eqLogicId,
      * and between start and end (in seconds UTC)
      */
-    public function byEqLogicIdTime($_id, $_start, $_end) {
+    public function byEqLogicIdTime($_eqLogicId, $_start, $_end) {
 
 		$parameters = array(
 			'eqLogicId' => $_eqLogicId,
             'start'     => $_start,
             'end'       => $_end,
 		);
-        $sql = 'SELECT eqLogicId, stravaId, time, name, distance, duration, elevation
+        $sql = 'SELECT eqLogicId, stravaId, time, name AS type, distance, duration, elevation
 				FROM `stravaActivity` activity, `stravaSport` sport
-				WHERE `eqLogicId` = :$eqLogicId AND `time` >= :start AND `time` <= :end
+				WHERE `eqLogicId` = :eqLogicId AND `time` >= :start AND `time` <= :end
 				 	AND activity.type = sport.type
 				GROUP BY time ORDER BY eqLogicId, time;';
 		return DB::Prepare($sql, $parameters, DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);

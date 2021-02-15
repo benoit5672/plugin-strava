@@ -801,25 +801,41 @@ class strava extends eqLogic {
         log::add('strava', 'debug', 'Activities to process: ' . count($_activities));
         $start_of_this_week = strtotime('monday this week GMT');
         foreach ($_activities as $activity) {
-            $type  = $activity['type'];
-            $start = strtotime($activity['start_date']) - $activity['utc_offset'];
+
+            $start     = 0;
+            $distance  = 0;
+            $elevation = 0;
+            $duration  = 0;
+
+            if (!is_array($activity) && is_a($activity, 'stravaActivity')) {
+                // Info comes from DB
+                $type      = $activity->getSport();
+                $start     = $activity->getTime();
+                $distance  = $activity->getDistance();
+                $duration  = $activity->getDuration();
+                $elevation = $activity->getElevation();
+            } else {
+                // Info comes from Strava API
+                $type  = $activity['type'];
+                $start = strtotime($activity['start_date']) - $activity['utc_offset'];
+                if (isset($activity['distance'])) {
+                    $distance = $activity['distance'];
+                }
+                if (isset($activity['total_elevation_gain'])) {
+                    $elevation = $activity['total_elevation_gain'];
+                }
+                if (isset($activity['elapsed_time'])) {
+                    // Strava API
+                    $duration = $activity['elapsed_time'];
+                }
+            }
+            $distance = round($distance / 1000, 2);
+
             $last  = $this->getConfiguration('last_update', 0);
             if (($this->getConfiguration($type, 0) == 1) and ($start > $last)) {
 
                 // This activity is monitored, let's process it !
-                $distance  = 0;
-                $elevation = 0;
-                $time      = 0;
-                // Load the information, if any
-                if (isset($activity['distance'])) {
-                	$distance = round($activity['distance'] / 1000, 2);
-                }
-                if (isset($activity['total_elevation_gain'])) {
-                	$elevation = $activity['total_elevation_gain'];
-                }
-                if (isset($activity['elapsed_time'])) {
-                	$time = $activity['elapsed_time'];
-                }
+
                 // Weekly Cmd objects
                 $w_c = $this->getCmd(null, $type . '_count');
                 $w_d = $this->getCmd(null, $type . '_distance');
@@ -847,13 +863,15 @@ class strava extends eqLogic {
                     $this->checkAndUpdateCmd($w_c, ($w_o_c + 1));
                     $this->checkAndUpdateCmd($w_d, ($w_o_d + $distance));
                     $this->checkAndUpdateCmd($w_e, ($w_o_e + $elevation));
-                    $this->checkAndUpdateCmd($w_t, ($w_o_t + $time));
+                    $this->checkAndUpdateCmd($w_t, ($w_o_t + $duration));
                 }
                 // Year
                 $this->checkAndUpdateCmd($y_c, ($y_o_c + 1));
                 $this->checkAndUpdateCmd($y_d, ($y_o_d + $distance));
                 $this->checkAndUpdateCmd($y_e, ($y_o_e + $elevation));
-                $this->checkAndUpdateCmd($y_t, ($y_o_t + $time));
+                $this->checkAndUpdateCmd($y_t, ($y_o_t + $duration));
+                log::add('strava', 'debug', 'activity added: type: ' . $type
+                            . ', time: ' . $start . 'last: '. $last);
             } else {
                 log::add('strava', 'debug', 'activity ignored: type: ' . $type
                             . ', time: ' . $start . 'last: '. $last);
@@ -960,7 +978,7 @@ class strava extends eqLogic {
 
 
     // refresh
-    public function refresh() {
+    public function refreshActivities() {
         // Update the yearly and weekly activities from the database
         $activities = stravaActivity::byEqLogicIdTime(
                 $this->getId(),
@@ -1125,10 +1143,11 @@ class stravaCmd extends cmd {
 
      // Exécution d'une commande
      public function execute($_options = array()) {
-        $eqLogic = $this->getId();
+        $eqLogic = $this->getEqLogic();
         switch ($this->getLogicalId()) {
             case 'refresh':
                 $eqLogic->forceStatsUpdate();
+                $eqLogic->refreshActivities();
                 break;
             case 'setWeight':
                 if(isset($_options['slider'])) {
