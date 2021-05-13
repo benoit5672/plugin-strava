@@ -32,16 +32,8 @@ if (!jeedom::apiAccess(init('apikey'), 'strava')) {
 // There is a trick here, instead of using eqLogic_id, which is the parameter
 // we sent to the function, it has been url_encoded with &amp. So search for
 // amp;amp;eqLogic_id instead of eqLogic_id
-$names=['eqLogic_id', 'amp;eqLogic_id', 'amp;amp;eqLogic_id'];
-$eqLogic = NULL;
-foreach ($names as $name) {
-    $eqLogic = eqLogic::byId(init($name));
-    if (is_object($eqLogic) && method_exists($eqLogic, 'getProvider')) {
-        break;
-    }
-    $eqLogic = NULL;
-}
-if (!is_object($eqLogic)) {
+$eqLogic = eqLogic::byId(init('eqLogic_id'));
+if (!is_object($eqLogic) && method_exists($eqLogic, 'getProvider')) {
 	echo 'Impossible de trouver l\'utilisateur Strava correspondant à : ' . init('eqLogic_id');
 	exit();
 }
@@ -57,7 +49,7 @@ if (!isConnect()) {
 //
 // As we extend AbstractProvider from League, then we should get our provider
 // check the state session compared to the state of the request
-// 
+//
 $provider = $eqLogic->getProvider();
 
 //
@@ -69,7 +61,7 @@ if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
 
     unset($_SESSION['oauth2state']);
     exit('Invalid state');
-} 
+}
 
 try {
     // Try to get an access token (using the authorization code grant)
@@ -91,8 +83,8 @@ try {
         $user = $provider->getResourceOwner($token);
 
         // Use these details to create a new profile
-        log::add('strava', 'info', __('L\'autorisation de l\'utilisateur ', __FILE__) 
-        		. $user->getFirstName() . ' ' . $user->getLastName() . '(' . $user->getId() 
+        log::add('strava', 'info', __('L\'autorisation de l\'utilisateur ', __FILE__)
+        		. $user->getFirstName() . ' ' . $user->getLastName() . '(' . $user->getId()
         		. __(') a réussie !', __FILE__));
         $eqLogic->setStravaId($user->getId());
 
@@ -109,9 +101,9 @@ try {
         $eqLogic->createSubscription(true);
     } catch (Exception $e) {
         // will try to do it later.
-    } 
-    
-    // At the end of the callback, go back to the configuration page of the STRAVA user 
+    }
+
+    // At the end of the callback, go back to the configuration page of the STRAVA user
     redirect(network::getNetworkAccess('external') . '/index.php?v=d&p=strava&m=strava&id=' . $eqLogic->getId());
 
 } catch (Exception $e) {

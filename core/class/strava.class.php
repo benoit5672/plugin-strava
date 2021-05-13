@@ -155,7 +155,7 @@ class strava extends eqLogic {
         return new StravaProvider([
             'clientId'     => $this->getConfiguration('client_id'),
             'clientSecret' => $this->getConfiguration('client_secret'),
-            'redirectUri'  => network::getNetworkAccess('external') . '/plugins/strava/core/php/authorization.php?apikey=' . jeedom::getApiKey('strava') . '&eqLogic_id=' . $this->getId()
+            'redirectUri'  => network::getNetworkAccess('external') . '/plugins/strava/core/php/authorization.php&amp;apikey=' . jeedom::getApiKey('strava') . '&amp;eqLogic_id=' . $this->getId()
          ]);
     }
 
@@ -824,9 +824,9 @@ class strava extends eqLogic {
                 if (isset($activity['total_elevation_gain'])) {
                     $elevation = $activity['total_elevation_gain'];
                 }
-                if (isset($activity['elapsed_time'])) {
+                if (isset($activity['moving_time'])) {
                     // Strava API
-                    $duration = $activity['elapsed_time'];
+                    $duration = $activity['moving_time'];
                 }
             }
             $distance = round($distance / 1000, 2);
@@ -954,7 +954,7 @@ class strava extends eqLogic {
                     (strtotime($activity['start_date']) - $activity['utc_offset']),
                     $activity['type'],
                     $activity['distance'],
-                    $activity['elapsed_time'],
+                    $activity['moving_time'],
                     $activity['total_elevation_gain']
             );
         }
