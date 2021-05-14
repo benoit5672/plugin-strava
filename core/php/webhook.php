@@ -42,16 +42,16 @@ if (!is_object($eqLogic)) {
 //
 // POST is used when an 'update' is received.
 // no need to be "connected" to jeedom to process notifications
-// 
+//
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $results = json_decode(file_get_contents('php://input'), true);
     //log::add('strava', 'debug', 'Notification content: ' . print_r($results, true));
     if (isset($results)) {
 
-        // 
+        //
         // Process the request, and return 200 OK
-        // 
-        if (isset($results['subscription_id']) 
+        //
+        if (isset($results['subscription_id'])
             and $results['subscription_id'] == $eqLogic->getConfiguration('subscription_id')) {
 
             // Update the eqLogic with the information provided
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $eqLogic->processSubscriptionNotification($results);
             } catch(Exception $e) {
-                // error processing the notification. 
+                // error processing the notification.
                 log::add('strava', 'warning', __('Erreur lors du traitement de la notification: ', __FILE__) . $e->getMessage());
                 http_response_code(500);
                 exit();
@@ -75,9 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
-// 
-// GET is used in the case of 'subscribe' challenge 
-// 
+//
+// GET is used in the case of 'subscribe' challenge
+//
 log::add('strava', 'debug', 'REQUEST_METHOD=' . $_SERVER['REQUEST_METHOD'] . 'args=' . print_r($_GET, true));
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
    if (isset($_GET['hub_challenge']) and isset($_GET['hub_mode']) and isset($_GET['hub_verify_token'])
@@ -87,19 +87,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
        log::add('strava', 'debug', 'Respond with hub.challenge');
        // respond with 200 OK, and hub_challenge
-       // 
+       //
        echo json_encode(['hub.challenge' => $_GET['hub_challenge']]);
        http_response_code(200);
        exit();
    } else {
        log::add('strava', 'error', __("Au moins un paramètre hub.mode, hub.verify_token est manquant ou invalide",__FILE__));
-       log::add('strava', 'debug', 'return error 403'); 
+       log::add('strava', 'debug', 'return error 403');
        http_response_code(403);
        die();
    }
-} 
+}
 
 // Invalid processing, return an error
-log::add('strava', 'error', 'Invalide requête reçue sur le webhook Strava'); 
+log::add('strava', 'error', 'Invalide requête reçue sur le webhook Strava');
 http_response_code(500);
-
