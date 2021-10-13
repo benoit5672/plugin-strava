@@ -155,7 +155,7 @@ class strava extends eqLogic {
         return new StravaProvider([
             'clientId'     => $this->getConfiguration('client_id'),
             'clientSecret' => $this->getConfiguration('client_secret'),
-            'redirectUri'  => network::getNetworkAccess('external') . '/plugins/strava/core/php/authorization.php&amp;apikey=' . jeedom::getApiKey('strava') . '&amp;eqLogic_id=' . $this->getId()
+            'redirectUri'  => network::getNetworkAccess('external') . '/plugins/strava/core/php/authorization.php?apikey=' . jeedom::getApiKey('strava') . '&eqLogic_id=' . $this->getId()
          ]);
     }
 
@@ -349,7 +349,7 @@ class strava extends eqLogic {
                 }
             }
         } else {
-            log::add('strava', 'warning', __('Vous n\'etes pas connecté à Strava', __FILE__));
+            log::add('strava', 'warning', __('Vous n\'êtes pas connecté à Strava', __FILE__));
         }
         log::add('strava', 'debug', 'Return ' . count($activities) . ' activities');
         return $activities;
@@ -362,7 +362,7 @@ class strava extends eqLogic {
                     $this->getProvider()->getBaseApi() . '/activities/' . $_id
                             .'?include_all_effort=false');
         }
-        log::add('strava', 'warning', __('Vous n\'etes pas connecté à Strava', __FILE__));
+        log::add('strava', 'warning', __('Vous n\'êtes pas connecté à Strava', __FILE__));
         return [];
     }
 
@@ -373,7 +373,7 @@ class strava extends eqLogic {
                 throw new Exception(__('Sauvegarder l\'athlète avant d\'appliquer cette commande', __FILE__));
             }
             if (!$this->isRegisteredToStrava()) {
-                throw new Exception(__('Vous n\'etes pas connecté à Strava', __FILE__));
+                throw new Exception(__('Vous n\'êtes pas connecté à Strava', __FILE__));
             }
             $this->resetStats(true, true);
             $this->forceStatsUpdate();
@@ -387,7 +387,7 @@ class strava extends eqLogic {
                 throw new Exception(__('Sauvegarder l\'athlète avant d\'appliquer cette commande', __FILE__));
             }
             if (!$this->isRegisteredToStrava()) {
-                throw new Exception(__('Vous n\'etes pas connecté à Strava', __FILE__));
+                throw new Exception(__('Vous n\'êtes pas connecté à Strava', __FILE__));
             }
             $activities = $this->getActivitiesStats(time(), $this->getConfiguration('last_update'));
             $this->storeActivities($activities);
@@ -764,6 +764,18 @@ class strava extends eqLogic {
         }
     }
 
+    private function hideCommands($_logicalId) {
+
+        $extensions = ['_count', '_distance', '_elevation', '_time',
+                       '_count_year', '_distance_year', '_elevation_year', '_time_year'];
+
+        foreach ($extensions as $extension) {
+            $cmd = $this->getCmd(null, $_logicalId . $extension);
+        if (is_object($cmd)) {
+                $cmd->setIsVisible(0);
+            }
+        }
+    }
 
     private static function endsWith( $str, $sub ) {
         return ( substr( $str, strlen( $str ) - strlen( $sub ) ) === $sub );

@@ -80,9 +80,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //
 log::add('strava', 'debug', 'REQUEST_METHOD=' . $_SERVER['REQUEST_METHOD'] . 'args=' . print_r($_GET, true));
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-   if (isset($_GET['hub_challenge']) and isset($_GET['hub_mode']) and isset($_GET['hub_verify_token'])
+   if (isset($_GET['eqLogic_id']) && !isset($_GET['hub_verify_token'])) {
+       $pos = strpos($_GET['eqLogic_id'], '?hub.verify_token=');
+       log::add('strava', 'debug', 'hub_verify_token position in eqLogic_id: ' . $pos . ', token pos=' . ($pos + strlen('?hub.verify_token=')));
+       if ($pos !== false) {
+           $pos += (strlen('?hub.verify_token='));
+           $hub_verify_token = substr($_GET['eqLogic_id'], $pos);
+           log::add('strava', 'debug', 'hub_verify_token in eqLogic_id: ' . $hub_verify_token);
+       }
+   } else {
+       $hub_verify_token = $_GET['hub_verify_token'];
+   }
+   if (isset($_GET['hub_challenge']) and isset($_GET['hub_mode']) and isset($hub_verify_token)
        and ($_GET['hub_mode'] == 'subscribe')
-       and ($_GET['hub_verify_token'] == $eqLogic->getCache('subscription_token'))) {
+       and ($hub_verify_token == $eqLogic->getCache('subscription_token'))) {
        //and ($_GET['hub_verify_token'] == $eqLogic->getConfiguration('subscription_token'))) {
 
        log::add('strava', 'debug', 'Respond with hub.challenge');
