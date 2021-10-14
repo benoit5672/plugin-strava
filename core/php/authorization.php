@@ -32,14 +32,22 @@ if (!jeedom::apiAccess(init('apikey'), 'strava')) {
 // There is a trick here, instead of using eqLogic_id, which is the parameter
 // we sent to the function, it has been url_encoded with &amp. So search for
 // amp;amp;eqLogic_id instead of eqLogic_id
-$eqLogic = eqLogic::byId(init('eqLogic_id'));
-if (!is_object($eqLogic) && method_exists($eqLogic, 'getProvider')) {
+$names=['eqLogic_id', 'amp;eqLogic_id', 'amp;amp;eqLogic_id'];
+$eqLogic = NULL;
+foreach ($names as $name) {
+    $eqLogic = eqLogic::byId(init($name));
+    if (is_object($eqLogic) && method_exists($eqLogic, 'getProvider')) {
+        break;
+    }
+    $eqLogic = NULL;
+}
+if (!is_object($eqLogic)) {
 	echo 'Impossible de trouver l\'utilisateur Strava correspondant à : ' . init('eqLogic_id');
 	exit();
 }
 
 if (!isConnect()) {
-	echo 'Vous ne pouvez appeler cette page sans être connecté. Veuillez vous connecter <a href=' . network::getNetworkAccess() . '/index.php>ici</a> avant et refaire l\'opération de synchronisation';
+	echo 'Vous ne pouvez appeler cette page sans être connecté. Veuillez vous connecter <a href=' . network::getNetworkAccess('external') . '/index.php>ici</a> avant et refaire l\'opération de synchronisation';
 	die();
 }
 

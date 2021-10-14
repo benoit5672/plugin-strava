@@ -92,7 +92,9 @@ Il est important que le nom soit unique, car le nombre de requêtes quotidiennes
 
 - **Website**: C'est le web site permettant d'accéder à votre Jeedom, donc par exemple jeedom.xxxx.ovh
 
-- **Domaine du rappel pour autorisation**: Recopiez dans cette zone, les informations 'Domaine du rappel pour autorisation' de l'athlète que vous êtes entrain de créer (voir ci-dessous)
+- **Domaine du rappel pour autorisation**: Recopiez dans cette zone, les informations 'Domaine du rappel pour autorisation' de l'athlète que vous êtes entrain de créer (voir ci-dessous).
+
+
 
 ## Autorisation dans le plugin Strava de Jeedom
 
@@ -104,6 +106,8 @@ Il est important que le nom soit unique, car le nombre de requêtes quotidiennes
 >**IMPORTANT**
 >
 > Il est indispensable que le domaine que vous spécifiiez dans la zone 'Domaine du rappel pour autorisation' soit accessible depuis l'extérieur en https. Le nom utiliser par le plugin est le nom configurer dans Jeedom, dans la section réseau.
+
+Si vous avez une erreur vous indiquant que vous devez d'abord être connecte pour exécuter cette action, alors, vous devez vous connecter a jeedom en utilisant le nom domaine externe et non pas l'adresse locale.
 
 
 #### Connect with Strava
@@ -168,9 +172,15 @@ Cela veux peut-être dire qu'il est temps de faire un peu de sport, hein !
 
 ![razstatistics](../assets/images/razstatistics.png)
 
+# Sauvegarde en bases de données
+
+Toutes les informations sont sauvegardées dans la base de données de jeedom, dans 2 tables (stravaActivity et stravaSport). La taille des tables restent très raisonnable, car seulement une partie des informations fournies par Strava est stockée.
+L'utilisation de cette base de données permet
+- de supprimer les données de jeedom, quand elles sont supprimées de Strava.
+- de sauvegarder les informations de toutes les activités pratiquées, quelque soit le filtre que vous appliquez pour l’athlète. Donc, si vous cochez/décochez des sports a afficher dans l’athlète, il n'y a pas besoin de faire une remise a zéro des statistiques. 
+
 # Limitations connues
 
-- Si une activité est modifiée ou supprimée dans Strava, le plugin sera notifié, mais n'est pas en mesure de mettre à jour ses compteurs. En effet, le choix à été fait de ne pas sauvegarder en base de données de Jeedom les enregistrements Strava, et il est donc impossible au plugin de connaître l'événement concerné par cette notification.
 - Il n'y à pas pour l'instant de gestion des équipements (chaussures, vélos, ...). C'est en projet, mais cela viendra un peu plus tard, après la stabilisation (beta) du plugin.
 - le widget est ***"moche"***, j'en suis bien conscient, mais les informations sont la. Libre à vous de créer un virtuel, ou un 'customTemplate' permettant d'avoir une visualisation plus jolie par sport, avec icône, des temps qui ne soient pas en secondes, et ....
 Il y à pas mal de personnes très douées dans la communauté pour se genre de tache, avec de la chance, elles sont aussi sportives et interessées par ce plugin.

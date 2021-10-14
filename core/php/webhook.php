@@ -82,7 +82,6 @@ log::add('strava', 'debug', 'REQUEST_METHOD=' . $_SERVER['REQUEST_METHOD'] . 'ar
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
    if (isset($_GET['eqLogic_id']) && !isset($_GET['hub_verify_token'])) {
        $pos = strpos($_GET['eqLogic_id'], '?hub.verify_token=');
-       log::add('strava', 'debug', 'hub_verify_token position in eqLogic_id: ' . $pos . ', token pos=' . ($pos + strlen('?hub.verify_token=')));
        if ($pos !== false) {
            $pos += (strlen('?hub.verify_token='));
            $hub_verify_token = substr($_GET['eqLogic_id'], $pos);
