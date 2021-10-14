@@ -16,6 +16,9 @@ Le plugin Strava de Jeedom a été développé de manière à être compatible a
 >Pour rappel s'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
 
 ***
+# 14/10/2021 (beta-0.4)
+- Mise à jour de la documentation, pour indiquer la mise en place d'une base de données, et également un conseil lors de l'autorisation accordée a Strava.
+Si vous avez déjà installe le plugin Strava, alors, pour mettre a jour la base de données, il vous suffit d'aller dans chaque athlète et de cliquer sur "RaZ Statistiques". Sinon, la procédure d'installation est documentée, il suffit de suivre la séquence pour autorise jeedom a accéder a vos information de Strava.
 
 # 01/02/2021 (beta-0.3)
 - Mise à jour de la documentation, notamment concernant la création de l'application dans Strava. Ajout des accents dans la documentation en Français.

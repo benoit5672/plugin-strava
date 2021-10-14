@@ -47,7 +47,7 @@ if (!is_object($eqLogic)) {
 }
 
 if (!isConnect()) {
-	echo 'Vous ne pouvez appeler cette page sans être connecté. Veuillez vous connecter <a href=' . network::getNetworkAccess() . '/index.php>ici</a> avant et refaire l\'opération de synchronisation';
+	echo 'Vous ne pouvez appeler cette page sans être connecté. Veuillez vous connecter <a href=' . network::getNetworkAccess('external') . '/index.php>ici</a> avant et refaire l\'opération de synchronisation';
 	die();
 }
 
@@ -57,7 +57,7 @@ if (!isConnect()) {
 //
 // As we extend AbstractProvider from League, then we should get our provider
 // check the state session compared to the state of the request
-// 
+//
 $provider = $eqLogic->getProvider();
 
 //
@@ -69,7 +69,7 @@ if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
 
     unset($_SESSION['oauth2state']);
     exit('Invalid state');
-} 
+}
 
 try {
     // Try to get an access token (using the authorization code grant)
@@ -91,8 +91,8 @@ try {
         $user = $provider->getResourceOwner($token);
 
         // Use these details to create a new profile
-        log::add('strava', 'info', __('L\'autorisation de l\'utilisateur ', __FILE__) 
-        		. $user->getFirstName() . ' ' . $user->getLastName() . '(' . $user->getId() 
+        log::add('strava', 'info', __('L\'autorisation de l\'utilisateur ', __FILE__)
+        		. $user->getFirstName() . ' ' . $user->getLastName() . '(' . $user->getId()
         		. __(') a réussie !', __FILE__));
         $eqLogic->setStravaId($user->getId());
 
@@ -109,9 +109,9 @@ try {
         $eqLogic->createSubscription(true);
     } catch (Exception $e) {
         // will try to do it later.
-    } 
-    
-    // At the end of the callback, go back to the configuration page of the STRAVA user 
+    }
+
+    // At the end of the callback, go back to the configuration page of the STRAVA user
     redirect(network::getNetworkAccess('external') . '/index.php?v=d&p=strava&m=strava&id=' . $eqLogic->getId());
 
 } catch (Exception $e) {
