@@ -18,19 +18,58 @@
 
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
+  function createDB() {
+      // Create the table with all the monitored sports
+      $sql = 'CREATE TABLE IF NOT EXISTS `stravaSport` ('
+             . '`type` TINYINT UNSIGNED UNIQUE NOT NULL,'
+             . '`name` VARCHAR(32) NOT NULL'
+             . ') ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+      DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
+
+      // Populate the stravaTypeDB
+      $sql = 'INSERT IGNORE INTO `stravaSport` (`type`, `name`) VALUES'
+                . '(1, "AlpineSki"), (2, "BackcountrySki"), (3, "Canoeing"), '
+                . '(4, "Crossfit"), (5, "EBikeRide"), (6, "Elliptical"), '
+                . '(7, "Golf"), (8, "Handcycle"), (9, "Hike"), (10, "Iceskate"), '
+                . '(11, "InlineSkate"), (12, "Kayaking"), (13, "Kitesurf"), '
+                . '(14, "NordicSki"), (15, "Ride"), (16, "RockClimbing"), '
+                . '(17, "RollerSki"), (18, "Rowing"), (19, "Run"), (20, "Sail"), '
+                . '(21, "Skateboard"), (22, "Snowboard"), (23, "Snowshoe"), '
+                . '(24, "Soccer"), (25, "StairStepper"), (26, "StandUpPaddling"), '
+                . '(27, "Surfing"), (28, "Swim"), (29, "Velomobile"), '
+                . '(30, "VirtualRide"), (31, "VirtualRun"), (32, "Walk") ,'
+                . '(33, "WeightTraining"), (34, "Wheelchair"), (35, "Windsurf"), '
+                . '(36, "Workout"), (37, "Yoga");';
+      DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
+
+      // Create the table where the activities are stored
+      $sql = 'CREATE TABLE IF NOT EXISTS `stravaActivity` ('
+             . '`eqLogicId` INT(11) NOT NULL,'
+             . '`stravaId` BIGINT UNSIGNED UNIQUE NOT NULL,'
+             . '`time` INT UNSIGNED NOT NULL,'
+             . '`type` TINYINT UNSIGNED NOT NULL,'
+             . '`distance` FLOAT UNSIGNED NOT NULL,'
+             . '`duration` INT UNSIGNED NOT NULL,'
+             . '`elevation` FLOAT UNSIGNED NOT NULL'
+             . ') ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+      DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
+}
+
 // Fonction exécutée automatiquement après l'installation du plugin
-  function template_install() {
-
+  function strava_install() {
+      createDB();
   }
 
-// Fonction exécutée automatiquement après la mise à jour du plugin
-  function template_update() {
-
+  // Fonction exécutée automatiquement après la mise à jour du plugin
+  function strava_update() {
+      createDB();
   }
 
-// Fonction exécutée automatiquement après la suppression du plugin
-  function template_remove() {
-
+  // Fonction exécutée automatiquement après la suppression du plugin
+  function strava_remove() {
+      // drop the table where the activities are stored
+      DB::Prepare('DROP TABLE IF EXISTS `stravaActivity`;', array(), DB::FETCH_TYPE_ROW);
+      DB::Prepare('DROP TABLE IF EXISTS `stravaSport`;', array(), DB::FETCH_TYPE_ROW);
   }
 
 ?>
