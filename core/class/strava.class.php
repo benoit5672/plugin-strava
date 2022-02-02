@@ -233,7 +233,7 @@ class strava extends eqLogic {
         session_start();
         $provider                = $this->getProvider();
         $authorizationUrl        = $provider->getAuthorizationUrl();
-        $_SESSION['oauth2state'] = $provider->getState();
+        cache::set('strava::state', $provider->getState(), 600);
         return $authorizationUrl;
     }
 

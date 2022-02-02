@@ -16,7 +16,6 @@
 * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 
 log::add('strava', 'debug', 'Received authorization request: ' . $_SERVER['REQUEST_URI']);
@@ -46,32 +45,32 @@ if (!is_object($eqLogic)) {
 	exit();
 }
 
-if (!isConnect()) {
-	echo 'Vous ne pouvez appeler cette page sans être connecté. Veuillez vous connecter <a href=' . network::getNetworkAccess('external') . '/index.php>ici</a> avant et refaire l\'opération de synchronisation';
-	die();
-}
-
-
 //
 // AUTHORIZATION CALLBACK
 //
-// As we extend AbstractProvider from League, then we should get our provider
-// check the state session compared to the state of the request
-//
-$provider = $eqLogic->getProvider();
 
 //
 // Check given state against previously stored one to mitigate CSRF attack
 //
-if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
+if (cache::exist('strava::state')) {
+	$state = cache::byKey('strava::state')->getValue();
+}
+if (empty($_GET['state']) || !isset($state) || $_GET['state'] !== $state) {
 
-    log::add('strava', 'error', __('Session invalide : _GET=' . $_GET['state'] . ', _SESSION=' . $_SESSION['oauth2state'], __FILE__));
-
-    unset($_SESSION['oauth2state']);
+    log::add('strava', 'error', __('Invalide state : _GET=' . $_GET['state'] . ', cache=' . $state, __FILE__));
+	if (cache::exist('strava::state')) {
+		cache::delete('strava::state');
+	}
     exit('Invalid state');
 }
+cache::delete('strava::state');
 
 try {
+	// As we extend AbstractProvider from League, then we should get our provider
+	// check the state session compared to the state of the request
+	//
+	$provider = $eqLogic->getProvider();
+
     // Try to get an access token (using the authorization code grant)
     // We use 'default' grant factory, so authorization_code will
     // use AuthorizationCode class
