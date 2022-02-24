@@ -93,7 +93,7 @@ class stravaActivity {
 				FROM `stravaActivity` activity, `stravaSport` sport
 				WHERE `eqLogicId` = :eqLogicId AND `time` >= :start AND `time` <= :end
 				 	AND activity.type = sport.type
-				GROUP BY time ORDER BY eqLogicId, time;';
+				GROUP BY eqLogicId, time ORDER BY time ASC;';
 		return DB::Prepare($sql, $parameters, DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
     }
 
