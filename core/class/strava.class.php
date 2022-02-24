@@ -101,7 +101,7 @@ class strava extends eqLogic {
                     $eqLogic->resetStats(true, false);
                 }
                 // reset counters if this is a new year
-                if (strtotime('today GMT') == strtotime('first day of January '.date('Y'). 'GMT')) {
+                if (strtotime('today GMT') == strtotime('first day of January this year GMT')) {
                     log::add('strava', 'info', __('Re-initialisation des statistiques de l\'année', __FILE__));
                     $eqLogic->resetStats(false, true);
                 }
@@ -615,14 +615,14 @@ class strava extends eqLogic {
             $cmd->setIsVisible(1);
             $cmd->setOrder($_order);
             $cmd->setName($_name . __(' (Total Hebdo)', __FILE__));
+            $cmd->setType('info');
+            $cmd->setSubType('numeric');
             $cmd->setTemplate('dashboard', 'line');
             $cmd->setTemplate('mobile', 'line');
+            $cmd->setEqLogic_id($this->getId());
+            $cmd->save();
         }
         $_order++;
-        $cmd->setType('info');
-        $cmd->setSubType('numeric');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
 
         // Distance (week)
         $cmd = $this->getCmd(null, $_logicalId . '_distance');
@@ -632,15 +632,15 @@ class strava extends eqLogic {
             $cmd->setIsVisible(1);
             $cmd->setOrder($_order);
             $cmd->setName($_name . __(' (Distance Hebdo)', __FILE__));
+            $cmd->setType('info');
+            $cmd->setSubType('numeric');
             $cmd->setTemplate('dashboard', 'line');
             $cmd->setTemplate('mobile', 'line');
+            $cmd->setUnite('km');
+            $cmd->setEqLogic_id($this->getId());
+            $cmd->save();
         }
         $_order++;
-        $cmd->setType('info');
-        $cmd->setSubType('numeric');
-        $cmd->setUnite('kms');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
 
         // Elevation (week)
         $cmd = $this->getCmd(null, $_logicalId . '_elevation');
@@ -650,15 +650,15 @@ class strava extends eqLogic {
             $cmd->setIsVisible(1);
             $cmd->setOrder($_order);
             $cmd->setName($_name . __(' (Dénivelé Hebdo)', __FILE__));
+            $cmd->setType('info');
+            $cmd->setSubType('numeric');
             $cmd->setTemplate('dashboard', 'line');
             $cmd->setTemplate('mobile', 'line');
+            $cmd->setUnite('m');
+            $cmd->setEqLogic_id($this->getId());
+            $cmd->save();
         }
         $_order++;
-        $cmd->setType('info');
-        $cmd->setSubType('numeric');
-        $cmd->setUnite('m');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
 
         // time
         $cmd = $this->getCmd(null, $_logicalId . '_time');
@@ -668,15 +668,15 @@ class strava extends eqLogic {
             $cmd->setIsVisible(1);
             $cmd->setOrder($_order);
             $cmd->setName($_name . __(' (Temps Hebdo)', __FILE__));
-            $cmd->setTemplate('dashboard', 'stravaDuration');
-            $cmd->setTemplate('mobile', 'stravaDuration');
+            $cmd->setUnite('');
+            $cmd->setType('info');
+            $cmd->setSubType('numeric');
+            $cmd->setTemplate('dashboard', 'strava::stravaDuration');
+            $cmd->setTemplate('mobile', 'strava::stravaDuration');
+            $cmd->setEqLogic_id($this->getId());
+            $cmd->save();
         }
         $_order++;
-        $cmd->setType('info');
-        $cmd->setSubType('numeric');
-        $cmd->setUnite('');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
 
         //
         // Total (year)
@@ -687,14 +687,14 @@ class strava extends eqLogic {
             $cmd->setIsVisible(1);
             $cmd->setOrder($_order);
             $cmd->setName($_name . __(' (Total annuel)', __FILE__));
+            $cmd->setType('info');
+            $cmd->setSubType('numeric');
             $cmd->setTemplate('dashboard', 'line');
             $cmd->setTemplate('mobile', 'line');
+            $cmd->setEqLogic_id($this->getId());
+            $cmd->save();
         }
         $_order++;
-        $cmd->setType('info');
-        $cmd->setSubType('numeric');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
 
         // Distance (year)
         $cmd = $this->getCmd(null, $_logicalId . '_distance_year');
@@ -704,15 +704,15 @@ class strava extends eqLogic {
             $cmd->setIsVisible(1);
             $cmd->setOrder($_order);
             $cmd->setName($_name . __(' (Distance annuelle)', __FILE__));
+            $cmd->setType('info');
+            $cmd->setSubType('numeric');
+            $cmd->setUnite('km');
+            $cmd->setEqLogic_id($this->getId());
             $cmd->setTemplate('dashboard', 'line');
             $cmd->setTemplate('mobile', 'line');
+            $cmd->save();
         }
         $_order++;
-        $cmd->setType('info');
-        $cmd->setSubType('numeric');
-        $cmd->setUnite('kms');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
 
         // Elevation (year)
         $cmd = $this->getCmd(null, $_logicalId . '_elevation_year');
@@ -722,15 +722,15 @@ class strava extends eqLogic {
             $cmd->setIsVisible(1);
             $cmd->setOrder($_order);
             $cmd->setName($_name . __(' (Dénivelé annuel)', __FILE__));
+            $cmd->setType('info');
+            $cmd->setSubType('numeric');
             $cmd->setTemplate('dashboard', 'line');
             $cmd->setTemplate('mobile', 'line');
+            $cmd->setUnite('m');
+            $cmd->setEqLogic_id($this->getId());
+            $cmd->save();
         }
         $_order++;
-        $cmd->setType('info');
-        $cmd->setSubType('numeric');
-        $cmd->setUnite('m');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
 
         // time (year)
         $cmd = $this->getCmd(null, $_logicalId . '_time_year');
@@ -740,15 +740,15 @@ class strava extends eqLogic {
             $cmd->setIsVisible(1);
             $cmd->setOrder($_order);
             $cmd->setName($_name . __(' (Temps annuel)', __FILE__));
-            $cmd->setTemplate('dashboard', 'stravaDuration');
-            $cmd->setTemplate('mobile', 'stravaDuration');
+            $cmd->setUnite('');
+            $cmd->setType('info');
+            $cmd->setSubType('numeric');
+            $cmd->setTemplate('dashboard', 'strava::stravaDuration');
+            $cmd->setTemplate('mobile', 'strava::stravaDuration');
+            $cmd->setEqLogic_id($this->getId());
+            $cmd->save();
         }
         $_order++;
-        $cmd->setType('info');
-        $cmd->setSubType('numeric');
-        $cmd->setUnite('');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
     }
 
     private function deleteCommands($_logicalId) {
@@ -804,14 +804,14 @@ class strava extends eqLogic {
                 }
             }
         }
-        $this->setConfiguration('last_update', strtotime('first day of january '.date('Y').' GMT'));
+        $this->setConfiguration('last_update', strtotime('first day of January this year GMT'));
         $this->save();
     }
 
     // Synchronized the information
     private function syncStats($_activities) {
         log::add('strava', 'debug', 'Activities to process: ' . count($_activities));
-        $start_of_this_week = strtotime('monday this week GMT');
+        $weekLastActivity = 0;
         foreach ($_activities as $activity) {
 
             $start     = 0;
@@ -821,11 +821,11 @@ class strava extends eqLogic {
 
             if (!is_array($activity) && is_a($activity, 'stravaActivity')) {
                 // Info comes from DB
-                $type      = $activity->getSport();
-                $start     = $activity->getTime();
-                $distance  = $activity->getDistance();
-                $duration  = $activity->getDuration();
-                $elevation = $activity->getElevation();
+                $type         = $activity->getSport();
+                $start        = $activity->getTime();
+                $distance     = $activity->getDistance();
+                $duration     = $activity->getDuration();
+                $elevation    = $activity->getElevation();
             } else {
                 // Info comes from Strava API
                 $type  = $activity['type'];
@@ -841,9 +841,17 @@ class strava extends eqLogic {
                     $duration = $activity['moving_time'];
                 }
             }
-            $distance = round($distance / 1000, 2);
+            $dateActivity = date('Y-m-d H:i:s', $start);
+            $weekActivity = idate('W', $start);
+            $distance     = round($distance / 1000, 2);
 
             $last  = $this->getConfiguration('last_update', 0);
+            if ($weekLastActivity == 0) {
+                // this is the first activity we process, initialize the weekLastActivity with the current week
+               $weekLastActivity = idate('W', $start);
+            }
+          	log::add('strava', 'debug', 'Week last activity: '. $weekLastActivity . ', Week current activity: ' .$weekActivity);
+
             if (($this->getConfiguration($type, 0) == 1) and ($start > $last)) {
 
                 // This activity is monitored, let's process it !
@@ -859,34 +867,61 @@ class strava extends eqLogic {
                 $y_e = $this->getCmd(null, $type . '_elevation_year');
                 $y_t = $this->getCmd(null, $type . '_time_year');
 
-                // Weekly old values
-                $w_o_c = ($w_c->execCmd() != null) ? $w_c->execCmd() : 0;
-                $w_o_d = ($w_d->execCmd() != null) ? $w_d->execCmd() : 0;
-                $w_o_e = ($w_e->execCmd() != null) ? $w_e->execCmd() : 0;
-                $w_o_t = ($w_t->execCmd() != null) ? $w_t->execCmd() : 0;
-                // Yearly old values
+                // Initialize default value, in case this the first activity
+                // of a new week, otherwise, read the previous value for this week
+                $w_o_c = 0;
+                $w_o_d = 0;
+                $w_o_e = 0;
+                $w_o_t = 0;
+                if ($weekActivity == $weekLastActivity) {
+                    // New activity, same week, read existing values
+                    $w_o_c = ($w_c->execCmd() != null) ? $w_c->execCmd() : 0;
+                    $w_o_d = ($w_d->execCmd() != null) ? $w_d->execCmd() : 0;
+                    $w_o_e = ($w_e->execCmd() != null) ? $w_e->execCmd() : 0;
+                    $w_o_t = ($w_t->execCmd() != null) ? $w_t->execCmd() : 0;
+                }
+                // Yearly previous values
                 $y_o_c = ($y_c->execCmd() != null) ? $y_c->execCmd() : 0;
                 $y_o_d = ($y_d->execCmd() != null) ? $y_d->execCmd() : 0;
                 $y_o_e = ($y_e->execCmd() != null) ? $y_e->execCmd() : 0;
                 $y_o_t = ($y_t->execCmd() != null) ? $y_t->execCmd() : 0;
 
                 // Week
-                if ($start >= $start_of_this_week) {
-                    $this->checkAndUpdateCmd($w_c, ($w_o_c + 1));
-                    $this->checkAndUpdateCmd($w_d, ($w_o_d + $distance));
-                    $this->checkAndUpdateCmd($w_e, ($w_o_e + $elevation));
-                    $this->checkAndUpdateCmd($w_t, ($w_o_t + $duration));
-                }
+                $this->checkAndUpdateCmd($w_c, ($w_o_c + 1), $dateActivity);
+                $this->checkAndUpdateCmd($w_d, ($w_o_d + $distance), $dateActivity);
+                $this->checkAndUpdateCmd($w_e, ($w_o_e + $elevation), $dateActivity);
+                $this->checkAndUpdateCmd($w_t, ($w_o_t + $duration), $dateActivity);
+
                 // Year
-                $this->checkAndUpdateCmd($y_c, ($y_o_c + 1));
-                $this->checkAndUpdateCmd($y_d, ($y_o_d + $distance));
-                $this->checkAndUpdateCmd($y_e, ($y_o_e + $elevation));
-                $this->checkAndUpdateCmd($y_t, ($y_o_t + $duration));
+                $this->checkAndUpdateCmd($y_c, ($y_o_c + 1), $dateActivity);
+                $this->checkAndUpdateCmd($y_d, ($y_o_d + $distance), $dateActivity);
+                $this->checkAndUpdateCmd($y_e, ($y_o_e + $elevation), $dateActivity);
+                $this->checkAndUpdateCmd($y_t, ($y_o_t + $duration), $dateActivity);
                 log::add('strava', 'debug', 'activity added: type: ' . $type
-                            . ', time: ' . $start . 'last: '. $last);
+                            . ', time: ' . $dateActivity . ', week: ' .$weekActivity
+                            . ', last update: '. date('Y-m-d H:i:s', $last));
             } else {
                 log::add('strava', 'debug', 'activity ignored: type: ' . $type
-                            . ', time: ' . $start . 'last: '. $last);
+                            . ', time: ' . $dateActivity . ', week: ' .$weekActivity
+                            . ', last update: '. date('Y-m-d H:i:s', $last));
+            }
+            $weekLastActivity = $weekActivity;
+        }
+        if ($weekLastActivity != 0 and  $weekLastActivity != idate('W', time())) {
+            // We don't have data for the current week, just reset the week counters
+            $weekOffset = strtotime('first monday of January this year') + ($weekLastActivity * 604800);
+            $weekDate   = date('Y-m-d H:i:s', $weekOffset);
+            log::add('strava', 'debug', 'Reset starting week ' . $weekDate . '(' . $weekOffset . ')');
+            $extensions = ['_count', '_distance', '_elevation', '_time'];
+            $cmds       = $this->getCmd();
+            foreach ($cmds as $cmd) {
+                $name = $cmd->getLogicalId();
+                foreach ($extensions as $extension) {
+                    if(strava::endsWith($name, $extension)) {
+                        $this->checkAndUpdateCmd($cmd, 0, $weekDate);
+                        break;
+                    }
+                }
             }
         }
         $this->setConfiguration('last_update', time());
@@ -994,7 +1029,7 @@ class strava extends eqLogic {
         // Update the yearly and weekly activities from the database
         $activities = stravaActivity::byEqLogicIdTime(
                 $this->getId(),
-                strtotime('first day of january '.date('Y').' GMT'),
+                strtotime('first day of January this year GMT'),
                 time());
         $this->resetStats(true, true);
         $this->syncStats($activities);
@@ -1004,7 +1039,7 @@ class strava extends eqLogic {
     public function preSave() {
         // Update last_update
         if (0 == $this->getConfiguration('last_update', 0)) {
-            $this->setConfiguration('last_update', strtotime('first day of january '.date('Y').' GMT'));
+            $this->setConfiguration('last_update', strtotime('first day of January this year GMT'));
         }
     }
 
@@ -1029,10 +1064,12 @@ class strava extends eqLogic {
             $cmd->setName(__('Poids', __FILE__));
             $cmd->setTemplate('dashboard', 'line');
             $cmd->setTemplate('mobile', 'line');
+            $cmd->setType('info');
+            $cmd->setSubType('numeric');
+            $cmd->setUnite('kg');
         }
         $cmd->setType('info');
         $cmd->setSubType('numeric');
-        $cmd->setUnite('kg');
         $cmd->setEqLogic_id($this->getId());
         $cmd->save();
 

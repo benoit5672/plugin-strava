@@ -16,6 +16,14 @@ Le plugin Strava de Jeedom a été développé de manière à être compatible a
 >Pour rappel s'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
 
 ***
+# 24/02/2022 (beta-0.5)
+Des modifications ont été apportées a la version beta, suite aux remarques de sagitaz. Merci a lui d'avoir fait progresser le plugin !
+
+- Fixe concernant l'historique des informations (semaine) en cas de remise a zero, ou "refresh" sur un athlete.
+- Fixe sur les unités (km au lieu de kms), et ceux-ci ne sont plus écrasés lors d'une sauvegarde s'ils ont été mis a jour.
+- L'affichage des temps se fait au travers du widget d'affichage (Strava/stravaDuration) qui réalise un affichage heures:minutes:secondes au lieu de secondes comme auparavant.
+- Fixe sur les autorisations 'Strava' suite aux mises a jour sécurité de jeedom 4.2.
+
 # 14/10/2021 (beta-0.4)
 - Mise à jour de la documentation, pour indiquer la mise en place d'une base de données, et également un conseil lors de l'autorisation accordée a Strava.
 Si vous avez déjà installe le plugin Strava, alors, pour mettre a jour la base de données, il vous suffit d'aller dans chaque athlète et de cliquer sur "RaZ Statistiques". Sinon, la procédure d'installation est documentée, il suffit de suivre la séquence pour autorise jeedom a accéder a vos information de Strava.
