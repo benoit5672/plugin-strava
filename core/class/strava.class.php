@@ -116,7 +116,7 @@ class strava extends eqLogic {
                         $eqLogic->checkAndUpdateCmd('weight', $rsp['weight']);
                     }
                 } catch (Exception $e) {
-                    log::add('strava', 'error', __('Erreur: ' + $e->getMessage()));
+                    log::add('strava', 'error', 'Erreur: ' + $e->getMessage());
                 }
             }
         }
