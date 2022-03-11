@@ -77,12 +77,12 @@ function addCmdToTable(_cmd) {
 // benoit5672 code ---
 //
 function updateProgressBar(_bar, _usage, _limit) {
-    
+
     var value = 0;
     var color = 'bg-success';
     if (_limit != 0) {
-       value = Math.round(_usage / _limit); 
-    } 
+       value = Math.round(_usage / _limit);
+    }
     if (value <= 25) {
        color = 'bg-success'
     } else if (value <= 50) {
@@ -131,8 +131,8 @@ function printEqLogic(_eqLogic) {
 
     // Indicate the number of requests 15 minutes (usage/limit), and daily (usage/limit)
     $.ajax({
-        type: "POST", 
-        url: "plugins/strava/core/ajax/strava.ajax.php", 
+        type: "POST",
+        url: "plugins/strava/core/ajax/strava.ajax.php",
         data: {
             action: "getUsagesAndLimits",
             id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
@@ -167,8 +167,8 @@ function printEqLogic(_eqLogic) {
 
 $('#bt_connectWithStrava').on('click', function () {
     $.ajax({
-        type: "POST", 
-        url: "plugins/strava/core/ajax/strava.ajax.php", 
+        type: "POST",
+        url: "plugins/strava/core/ajax/strava.ajax.php",
         data: {
             action: "connectWithStrava",
             id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
@@ -190,8 +190,8 @@ $('#bt_connectWithStrava').on('click', function () {
 
 $('body').off('click','.bt_disconnectFromStrava').on('click','.bt_disconnectFromStrava', function () {
     $.ajax({
-        type: "POST", 
-        url: "plugins/strava/core/ajax/strava.ajax.php", 
+        type: "POST",
+        url: "plugins/strava/core/ajax/strava.ajax.php",
         data: {
             action: "disconnectFromStrava",
             id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
@@ -213,11 +213,11 @@ $('body').off('click','.bt_disconnectFromStrava').on('click','.bt_disconnectFrom
 
 
 $('body').off('click','.bt_razStatistics').on('click','.bt_razStatistics', function () {
-    bootbox.confirm('{{Êtes-vous sur de vouloir supprimer l\'historique des données et recharger toutes les données depuis Strava ? Assurez-vous d\'avoir selectionné les sports souhaites et d\'avoir sauvegardé l\'athlète}}', function(result) {
+    bootbox.confirm('{{Êtes-vous sur de vouloir supprimer l\'historique des données et recharger toutes les données depuis Strava ? Assurez-vous d\'avoir sélectionné les sports souhaites et d\'avoir sauvegardé l\'athlète}}', function(result) {
         if (result) {
             $.ajax({
-                type: "POST", 
-                url: "plugins/strava/core/ajax/strava.ajax.php", 
+                type: "POST",
+                url: "plugins/strava/core/ajax/strava.ajax.php",
                 data: {
                     action: "razStatistics",
                     id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
@@ -241,11 +241,11 @@ $('body').off('click','.bt_razStatistics').on('click','.bt_razStatistics', funct
 
 
 $('body').off('click','.bt_forceStatsUpdate').on('click','.bt_forceStatsUpdate', function () {
-    bootbox.confirm('{{Assurez-vous d\'avoir selectionné les sports souhaités et d\'avoir sauvegarde l\'athlète}}', function(result) {
+    bootbox.confirm('{{Assurez-vous d\'avoir sélectionné les sports souhaités et d\'avoir sauvegardé l\'athlète}}', function(result) {
         if (result) {
             $.ajax({
-                type: "POST", 
-                url: "plugins/strava/core/ajax/strava.ajax.php", 
+                type: "POST",
+                url: "plugins/strava/core/ajax/strava.ajax.php",
                 data: {
                     action: "forceStatsUpdate",
                     id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
@@ -260,6 +260,34 @@ $('body').off('click','.bt_forceStatsUpdate').on('click','.bt_forceStatsUpdate',
                         return;
                     } else {
                         $('#div_alert').showAlert({message: '{{Mise à jour des statistiques Strava réussie}}', level: 'success'});
+                    }
+                }
+            });
+        }
+    });
+});
+
+
+$('body').off('click','.bt_refreshActivities').on('click','.bt_refreshActivities', function () {
+    bootbox.confirm('{{Assurez-vous d\'avoir sélectionné les sports souhaités et d\'avoir sauvegarde l\'athlète}}', function(result) {
+        if (result) {
+            $.ajax({
+                type: "POST",
+                url: "plugins/strava/core/ajax/strava.ajax.php",
+                data: {
+                    action: "refreshActivities",
+                    id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
+                },
+                dataType: 'json',
+                error: function (request, status, error) {
+                    handleAjaxError(request, status, error);
+                },
+                success: function (data) {
+                    if (data.state != 'ok') {
+                        $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                        return;
+                    } else {
+                        $('#div_alert').showAlert({message: '{{Rafraîchissement des statistiques de l\'athlète réussi}}', level: 'success'});
                     }
                 }
             });

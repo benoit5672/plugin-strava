@@ -240,8 +240,9 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{Mise à jour}}</label>
 		                        <div>
-						           <a class="btn btn-warning tooltips bt_forceStatsUpdate" title="Force la mise à jour des informations de l'athlète depuis la dernière mise à jour."><i class="fas fa-times"></i> Forcer la mise a jour</a>
-                                   <a class="btn btn-danger tooltips bt_razStatistics" title="Recharge toutes les informations de l'athlète depuis le début de l'année."><i class="fas fa-times"></i> RaZ Statistiques</a>
+                                   <a class="btn btn-success tooltips bt_refreshActivities" title="Rafraîchit toutes informations de l’année pour l'athlète en utilisant la base de données Jeedom."><i class="fas fa-times"></i> Rafraîchir les données</a>
+						           <a class="btn btn-warning tooltips bt_forceStatsUpdate" title="Force la mise à jour des informations de l'athlète depuis la dernière mise à jour en interrogeant Strava."><i class="fas fa-times"></i> Forcer la mise a jour</a>
+                                   <a class="btn btn-danger tooltips bt_razStatistics" title="Recharge toutes les informations de l'athlète depuis le début de l'année en interrogeant Strava."><i class="fas fa-times"></i> RaZ Statistiques</a>
 			                    </div>
                             </div>
                         </div>

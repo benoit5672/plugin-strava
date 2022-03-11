@@ -29,6 +29,15 @@ Grâce à ce plugin, vous serez en temps réel au courant de votre bilan sportif
 - le cumul de dénivelé positif dans la semaine et dans l'année
 - le cumul de temps dans la semaine et dans l'année,
 
+et plus globalement:
+- nombre d'activités par jour.
+- la durée des efforts par jour.
+- le cumul du nombre d'activités pour la semaine en cours.
+- le cumul de la durée des efforts de la semaine en cours.
+- le cumul du nombre d'activités pour l’année en cours.
+- le cumul de la durée des efforts de l’année en cours.
+
+
 Strava propose également un service d'analyse de vos performances, qui prends bien sur en compte votre poids. Au travers du plugin, il est également possible de mettre votre poids à jour dans Strava, en utilisant par exemple les informations de votre balance connectée (merci à mmourcia pour l'idée !).
 
 
@@ -144,7 +153,19 @@ Si vous en êtes la, **c'est gagné**.
 
 ## Selection des sports
 
-Cochez les sports que vous voulez surveiller. Si vous faites d'autres sports qui sont présents dans Strava, ceux-ci seront tout simplement ignores par le plugin, et vous n'aurez donc pas de résumé.
+Cochez les sports que vous voulez surveiller. Si vous faites d'autres sports qui sont présents dans Strava, vous n'aurez pas le details (nombre de séances, distance, durée, et dénivelé), mais ceux-ci apparaîtront dans les cumuls globaux.
+
+1/ les sports configurés sont les sports pour lesquels vous voulez le detail des activités. Pour chaque sport coché, vous aurez le nombre de séances, le temps d'effort, et le dénivelé par semaine et par an.
+2/ Il y a également 6 compteurs "globaux", c'est a dire indépendant des sports sélectionnés dans la configuration de l'athlète.  
+
+- Compteur du nombre d'activités par jour. Ce champ est historiser par défaut, mode de lissage "max", et garder pendant 1 an.
+- Durée des efforts par jour. Ce champ est historiser par défaut, mode de lissage "max", et garder pendant 1 an.
+- Cumul du nombre d'activités pour la semaine en cours.
+- Cumul de la durée des efforts de la semaine en cours.
+- Cumul du nombre d'activités pour l’année en cours.
+- Cumul de la durée des efforts de l’année en cours.
+Ces compteurs permettent de "surveiller" uniquement les activités les plus courantes, mais d'avoir en meme temps des compteurs d’activités plus global. Par exemple, j'ai fait de manière très occasionnel des raquettes a neige cet hiver, j'ai envie de voir apparaître ces sorties dans mes compteurs annuels, sans toutefois surveiller l’activité 'Raquettes'.
+
 
 > Note:
 > Il à été volontairement choisi de ne pas créer tous les sports car il y à huit commandes créees par sport (4 pour la semaine, 4 pour l'année), donc cela fait trop de commandes inutiles.
@@ -177,7 +198,14 @@ Cela veux peut-être dire qu'il est temps de faire un peu de sport, hein !
 Toutes les informations sont sauvegardées dans la base de données de jeedom, dans 2 tables (stravaActivity et stravaSport). La taille des tables restent très raisonnable, car seulement une partie des informations fournies par Strava est stockée.
 L'utilisation de cette base de données permet
 - de supprimer les données de jeedom, quand elles sont supprimées de Strava.
-- de sauvegarder les informations de toutes les activités pratiquées, quelque soit le filtre que vous appliquez pour l’athlète. Donc, si vous cochez/décochez des sports a afficher dans l’athlète, il n'y a pas besoin de faire une remise a zéro des statistiques. 
+- de sauvegarder les informations de toutes les activités pratiquées, quelque soit le filtre que vous appliquez pour l’athlète. Donc, si vous cochez/décochez des sports a afficher dans l’athlète, il n'y a pas besoin de faire une remise a zéro des statistiques.
+
+# A quoi servent les boutons "Rafraîchir les données", "Forcer la mise a jour", et "RaZ Statistiques"
+
+- **Rafraîchir les données**: utilise la base de données Jeedom pour rafraîchir toutes les informations de l'athlète. Cela est utile notamment quand vous ajoutez ou supprimez des sports a "surveiller".
+- **Forcer la mise a jour**: si les informations du widget ne vous semble pas a jour, alors vous pouvez cliquer sur ce bouton. Jeedom va chercher a "completer" les données manquantes depuis la dernière mise a jour, et rafraîchir les données en utilisant les derniers informations de la base de données Jeedom.
+- **RaZ statistiques**: doit être fait lors de la creation d'un athlète, pour récupérer l'historique depuis Strava. Cela peut également
+être utilisé pour effacer toutes les informations de la base de données Jeedom pour cet athlete, puis récupérer l'ensemble des données de l'athlète depuis Strava, avant de rafraîchir les informations en utilisant la base de données Jeedom.
 
 # Limitations connues
 
