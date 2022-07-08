@@ -20,8 +20,8 @@ L'objectif n'est pas de dupliquer les informations contenues dans Strava, mais p
 >![37sports](./docs/assets/images/37sports.png)
 
 Le plugin se base sur l'API Strava, qui propose 2 types de requêtes.
-- Les requêtes dites 'pull', ou le plugin va chercher les informations dans Strava.
-- les requêtes dites 'push' quand Strava envoie une notification au plugin pour l'informer d'un changement dans Strava. C'est la cas par exemple quand une nouvelle activité est synchronisée entre votre montre et Strava, après une belle séance de vélo !
+- Les requêtes dites 'pull', où le plugin va chercher les informations dans Strava.
+- les requêtes dites 'push' quand Strava envoie une notification au plugin pour l'informer d'un changement dans Strava. C'est le cas par exemple quand une nouvelle activité est synchronisée entre votre montre et Strava, après une belle séance de vélo !
 
 Grâce à ce plugin, vous serez en temps réel au courant de votre bilan sportif, avec pour chacune des activités sélectionnées:
 - le nombre d’occurrences dans la semaine et dans l'année
@@ -29,4 +29,4 @@ Grâce à ce plugin, vous serez en temps réel au courant de votre bilan sportif
 - le cumul de dénivelé positif dans la semaine et dans l'année
 - le cumul de temps dans la semaine et dans l'année,
 
-Strava propose également un service d'analyse de vos performances, qui prends bien sur en compte votre poids. Au travers du plugin, il est également possible de mettre votre poids à jour dans Strava, en utilisant par exemple les informations de votre balance connectée (merci à mmourcia pour l'idée !).
+Strava propose également un service d'analyse de vos performances, qui prend bien sûr en compte votre poids. Au travers du plugin, il est également possible de mettre votre poids à jour dans Strava, en utilisant par exemple les informations de votre balance connectée (merci à mmourcia pour l'idée !).
