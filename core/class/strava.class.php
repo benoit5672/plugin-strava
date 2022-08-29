@@ -21,6 +21,8 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/strava_provider.class.php';
 require_once __DIR__  . '/strava_owner.class.php';
 require_once __DIR__  . '/strava_db.class.php';
+require_once __DIR__  . '/strava_lock.class.php';
+
 
 use League\OAuth2\Client\Token\AccessToken;
 
@@ -1086,27 +1088,46 @@ class strava extends eqLogic {
 
     // Enqueue notifications action
     private function enqueueNotification($_action, $_object_id) {
-        $queue           = new SplQueue();
-        $serializedQueue = $this->getConfiguration('dbQueue', '');
-        if ($serializedQueue!=='') {
-            $queue->unserialize($serializedQueue);
+
+        $lock = new StravaLock($this->getId());
+        try {
+            if ($lock->Lock()) {
+                $queue           = new SplQueue();
+                $serializedQueue = $this->getConfiguration('dbQueue', '');
+                if ($serializedQueue !== '') {
+                    $queue->unserialize($serializedQueue);
+                }
+                $queue->enqueue(['action' => $_action, 'object_id' => $_object_id]);
+                $this->setConfiguration('dbQueue', $queue->serialize());
+                $this->save(true);
+                $lock->unlock();
+            }
+        } finally {
+            unset($lock);
         }
-        $queue->enqueue(['action' => $_action, 'object_id' => $_object_id]);
-        $this->setConfiguration('dbQueue', $queue->serialize());
-        $this->save(true);
     }
 
     private function dequeueNotifications() {
+        // get the serialized queue from configuration
+        $lock = new StravaLock($this->getId());
         try {
-            $serializedQueue = $this->getConfiguration('dbQueue');
-            $this->setConfiguration('dbQueue', '');
-            $this->save(true);
+            if ($lock->Lock()) {
+                $serializedQueue = $this->getConfiguration('dbQueue');
+                $this->setConfiguration('dbQueue', '');
+                $this->save(true);
+                $lock->unlock();
+            }
+        } finally {
+            unset($lock);
+        }
+        // rebuild the queue from serialized elements
+        try {
 			$queue = new SplQueue();
 			$queue->unserialize($serializedQueue);
 			if ($queue->isEmpty()) {
-				//log::add('strava', 'debug', 'message dbQueue is empty');
-				return;
-			}
+			    //log::add('strava', 'debug', 'message dbQueue is empty');
+			    return;
+            }
 		} catch (\Throwable $th) {
 			log::add('strava', 'error', 'Error during unserialize dbQueue');
 			return;
@@ -1120,17 +1141,17 @@ class strava extends eqLogic {
                 if ($action === 'create') {
                     // Get the activity detail
                     $activity = $this->getActivity($object_id);
-                    log::add('strava', 'info', 'Notification: création de l\'activitée : ' . $object_id);
+                    log::add('strava', 'info', 'Notification de Strava: création de l\'activité : ' . $object_id);
                     $this->syncStats([$activity]);
                     $this->storeActivities([$activity]);
                 } else if ($action === 'delete') {
                     // Delete the activity and reload the information from the database
-                    log::add('strava', 'info', 'Notification: suppression de l\'activitée : ' . $object_id);
+                    log::add('strava', 'info', 'Notification de Strava: suppression de l\'activité : ' . $object_id);
                     stravaActivity::deleteActivity($this->getId(), $object_id);
                     $needRefresh = true;
                 } else if ($action === 'update') {
                     // Delete the activity, fetch the activity and re-create the activity
-                    log::add('strava', 'info', 'Notification: mise à jour de l\'activitée : ' . $object_id);
+                    log::add('strava', 'info', 'Notification de Strava: mise à jour de l\'activité : ' . $object_id);
                     $activity = $this->getActivity($object_id);
                     stravaActivity::deleteActivity($this->getId(), $object_id);
                     $this->storeActivities([$activity]);
@@ -1141,7 +1162,7 @@ class strava extends eqLogic {
             }
         }
         if ($needRefresh === true) {
-            $this->refresh();
+            $this->refreshActivities();
         }
     }
 
