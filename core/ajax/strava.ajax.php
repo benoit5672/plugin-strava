@@ -23,11 +23,11 @@ try {
     if (!isConnect('admin')) {
         throw new Exception(__('401 - Accès non autorisé', __FILE__));
     }
-    
+
   /* Fonction permettant l'envoi de l'entête 'Content-Type: application/json'
     En V3 : indiquer l'argument 'true' pour contrôler le token d'accès Jeedom
     En V4 : autoriser l'exécution d'une méthode 'action' en GET en indiquant le(s) nom(s) de(s) action(s) dans un tableau en argument
-  */  
+  */
     ajax::init();
 
     // Added my methods here....
@@ -74,9 +74,17 @@ try {
         ajax::success();
     }
 
+    if (init('action') === 'refreshActivities') {
+        $eqLogic = eqLogic::byId(init('id'));
+	    if (!is_object($eqLogic)) {
+	        throw new Exception(__('EqLogic non trouvé : ', __FILE__), init('id'));
+	    }
+        $eqLogic->refreshActivities();
+        ajax::success();
+    }
+
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */
 } catch (Exception $e) {
     ajax::error(displayException($e), $e->getCode());
 }
-

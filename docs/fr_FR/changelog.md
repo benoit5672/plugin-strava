@@ -17,6 +17,28 @@ Le plugin Strava de Jeedom a été développé de manière à être compatible a
 
 ***
 
+# 07/03/2020 (beta 1.1)
+Version basée sur la version stable-1.0.
+Toutes les informations de Strava se trouvant en base de données Jeedom, que le sport soit coché ou non dans la configuration
+de l'athlète, j'ai revu quelques peu la gestion de l'athlète.
+1/ les sports configures sont les sports pour lesquels vous voulez le detail des activités. Pour chaque sport coché, vous aurez le nombre de séances, le temps d'effort, et le dénivelé par semaine et par an.
+2/ **nouveau**: j'ai ajoute 6 compteurs "globaux", c'est a dire indépendant des sports sélectionnés dans la configuration de l'athlète.  
+
+- Compteur du nombre d'activités par jour. Ce champ est historiser par défaut, mode de lissage "max", et garder pendant 1 an.
+- Durée des efforts par jour. Ce champ est historiser par défaut, mode de lissage "max", et garder pendant 1 an.
+- Cumul du nombre d'activités pour la semaine en cours.
+- Cumul de la durée des efforts de la semaine en cours.
+- Cumul du nombre d'activités pour l’année en cours.
+- Cumul de la durée des efforts de l’année en cours.
+Ces nouveaux compteurs permettent de "surveiller" uniquement les activités les plus courantes, mais d'avoir en meme temps des compteurs d’activités plus global. Par exemple, j'ai fait de manière très occasionnel des raquettes a neige cet hiver, j'ai envie de voir apparaître ces sorties dans mes compteurs annuels, sans toutefois surveiller l’activité 'Raquettes'
+
+Dans la configuration de l'athlète, j'ai ajoute un bouton "Rafraîchir les données".
+
+- **nouveau** Rafraîchir les données: utilise la base de données Jeedom pour rafraîchir toutes les informations de l'athlète. Cela est utile notamment quand vous ajoutez ou supprimez des sports a "surveiller".
+- Forcer la mise a jour: si les informations du widget ne vous semble pas a jour, alors vous pouvez cliquer sur ce bouton. Jeedom va chercher a "completer" les données manquantes depuis la dernière mise a jour, et rafraîchir les données en utilisant les derniers informations de la base de données Jeedom.
+- RaZ statistiques: doit être fait lors de la creation d'un athlète, pour récupérer l'historique depuis Strava. Cela peut également
+être utilisé pour effacer toutes les informations de la base de données Jeedom pour cet athlete, puis récupérer l'ensemble des données de l'athlète depuis Strava, avant de rafraîchir les informations en utilisant la base de données Jeedom.
+
 # 28/02/2022 (stable-1.0)
 Version initiale, basee sur la version beta-0.5
 
