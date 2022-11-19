@@ -64,6 +64,11 @@ class strava extends eqLogic {
         foreach (eqLogic::byType(__CLASS__, true) as $eqLogic) {
             if (is_object($eqLogic)) {
                 // Retrieve the latest information
+                $last_update = stravaActivity::getLastUpdate($eqLogic->getId());
+                log::add('strava', 'info', 'Plugin strava started: last update in DB for ' . $eqLogic->getHumanName() . ': ' . date('d F Y H:i:s', $last_update));
+                $eqLogic->setConfiguration('last_update', $last_update);
+
+                // Update the information if the athlete is registered to Strava
                 if ($eqLogic->isRegisteredToStrava()) {
                     $eqLogic->forceStatsUpdate();
                 }

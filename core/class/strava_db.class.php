@@ -191,6 +191,28 @@ class stravaActivity {
 	}
 
 
+	/**
+	 * Get the last_update for the specified eqLogic.
+	 */
+	public static function getLastUpdate($_eqLogicId) {
+
+		$parameters = array (
+			'eqLogicId' => $_eqLogicId,
+        );
+		
+        $sql = 'SELECT eqLogicId, stravaId, time, name AS type, distance, duration, elevation
+				FROM `stravaActivity` activity, `stravaSport` sport
+				WHERE `eqLogicId` = :eqLogicId AND activity.type = sport.type
+				GROUP BY eqLogicId, time ORDER BY time DESC LIMIT 1;';
+		$values = DB::Prepare($sql, $parameters, DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
+		if (!is_array($values) || count($values) != 1 || !is_a($values[0], 'stravaActivity')) {
+			return strtotime('first day of January this year GMT');
+		}
+		return $values[0]->getTime();
+	}
+	
+
+
 	/*     * *********************Methode d'instance************************* */
 
     public function __construct($obj = null){
