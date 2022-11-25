@@ -25,53 +25,56 @@ $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder:
 * Fonction permettant l'affichage des commandes dans l'équipement
 */
 function addCmdToTable(_cmd) {
-  if (!isset(_cmd)) {
-     var _cmd = {configuration: {}};
-   }
-   if (!isset(_cmd.configuration)) {
-     _cmd.configuration = {};
-   }
-   var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
-   tr += '    <td style="min-width:300px;width:350px;">';
-   tr += '        <input class="cmdAttr form-control input-sm" data-l1key="id" style="display : none;">';
-   tr += '        <input class="cmdAttr form-control input-sm" data-l1key="name" style="width : 240px;" placeholder="{{Nom}}">';
-   tr += '    </td>';
-   tr += '    <td style="min-width:120px;width:240px;">';
-   tr += '        <label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label>';
-   tr += '        <label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label>';
-   tr += '    </td>';
-   tr += '    <td style="min-width:180px;">';
-   tr += '        <input class="cmdAttr form-control input-sm" data-l1key="type" style="display : none;">';
-   tr += '        <input class="cmdAttr form-control input-sm" data-l1key="subType" style="display : none;">';
-   if (is_numeric(_cmd.id)) {
-       tr += '    <input class="cmdAttr form-control input-sm" data-l1key="unite" placeholder="{{Unité}}" title="{{Unité}}" style="width:30%;display:inline-block;"/>';
-   }
-   tr += '    </td>';
-   tr += '    <td>';
-   if (is_numeric(_cmd.id)) {
-      tr += '     <a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fa fa-cogs"></i></a> ';
-      tr += '     <a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
-   }
-   tr += '    </td>';
-   tr += '    <td>';
-   tr += '    </td>';
-
-   tr += '</tr>';
-   $('#table_cmd tbody').append(tr);
-   var tr = $('#table_cmd tbody tr').last();
-   jeedom.eqLogic.builSelectCmd({
-     id:  $('.eqLogicAttr[data-l1key=id]').value(),
-     filter: {type: 'info'},
-     error: function (error) {
-       $('#div_alert').showAlert({message: error.message, level: 'danger'});
-     },
-     success: function (result) {
-       tr.find('.cmdAttr[data-l1key=value]').append(result);
-       tr.setValues(_cmd, '.cmdAttr');
-       jeedom.cmd.changeType(tr, init(_cmd.subType));
-     }
-   });
+    if (!isset(_cmd)) {
+        var _cmd = { configuration: {} }
+    }
+    if (!isset(_cmd.configuration)) {
+        _cmd.configuration = {}
+    }
+  
+    var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
+    tr += '    <td>';
+    tr += '        <input class="cmdAttr form-control input-sm" data-l1key="id" style="display : none;">';
+    tr += '        <input class="cmdAttr form-control input-sm" data-l1key="name" placeholder="{{Nom}}">';
+    tr += '    </td>';
+    tr += '    <td>';
+    tr += '        <span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>';
+    tr += '        <span class="subType" subType="' + init(_cmd.subType) + '"></span>';
+    tr += '    </td>';
+    tr += '    <td>';
+    tr += '        <label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label>';
+    tr += '        <label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label>';
+    if (is_numeric(_cmd.id)) {
+        tr += '    <input class="cmdAttr form-control input-sm" data-l1key="unite" placeholder="{{Unité}}" title="{{Unité}}" style="width:30%;display:inline-block;"/>';
+    }
+    tr += '    </td>';
+    tr += '    <td>';
+    tr += '       <span class="cmdAttr" data-l1key="htmlstate"></span>';
+    tr += '    </td>';   
+    tr += '    <td>';
+    if (is_numeric(_cmd.id)) {
+       tr += '     <a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fa fa-cogs"></i></a> ';
+       tr += '     <a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
+    }
+    tr += '    </td>';
+    tr += '</tr>';
+    $('#table_cmd tbody').append(tr)
+    var tr = $('#table_cmd tbody tr').last()
+    jeedom.eqLogic.buildSelectCmd({
+        id: $('.eqLogicAttr[data-l1key=id]').value(),
+        filter: { type: 'info' },
+        error: function (error) {
+            $('#div_alert').showAlert({ message: error.message, level: 'danger' })
+        },
+        success: function (result) {
+            tr.find('.cmdAttr[data-l1key=value]').append(result)
+            tr.setValues(_cmd, '.cmdAttr')
+            jeedom.cmd.changeType(tr, init(_cmd.subType))
+             tr.find('.cmdAttr[data-l1key=type],.cmdAttr[data-l1key=subType]').prop("disabled", true);
+        }
+     });
  }
+
 
 
 // benoit5672 code ---
