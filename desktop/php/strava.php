@@ -177,7 +177,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
                         </div>
                         <!-- Partie droite de l'onglet "Equipement" -->
                         <div class="col-lg-6">
-                            <legend><i class="fas fa-info"></i> {{Sports}}</legend>
+                            <legend><i class="fas fa-info"></i> {{Activités}}</legend>
                             <div class="form-group">
                             <?php
 
@@ -228,6 +228,26 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 }
                             ?>
                             </div>
+                            <br>
+                            <legend><i class="fas fa-wrench"></i> {{Suivi des activités}}</legend>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">{{par jour}}</label>
+                                <div class="col-sm-1">
+                                    <input type="checkbox" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="track_per_day"/>
+                                </div>
+                                <label class="col-sm-2 control-label">{{par semaine}}</label>
+                                <div class="col-sm-1">                                
+                                    <input type="checkbox" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="track_per_week" checked/>
+                                </div>
+                                <label class="col-sm-2 control-label">{{par mois}}</label>
+                                <div class="col-sm-1">                                
+                                    <input type="checkbox" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="track_per_month"/>
+                                </div>
+                                <label class="col-sm-2 control-label">{{par an}}</label>
+                                <div class="col-sm-1">                               
+                                    <input type="checkbox" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="track_per_year" checked/>
+                                </div>
+                            </div> 
                             <br>
                             <legend><i class="fas fa-wrench"></i> {{Statistiques}}</legend>
                             <div class="form-group">
