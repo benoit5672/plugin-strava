@@ -435,6 +435,11 @@ class strava extends eqLogic {
     //
     // Subscription: see @links: https://developers.strava.com/docs/webhooks/
     //
+    private function getSleepTime() {
+        // 750ms
+        return 7500000;
+    }
+
     private function subscriptionsRequest($_verb, $_url, $_options = array()) {
         if ($_verb === 'GET') {
             $url  = $_url . '?client_id=' . urlencode($this->getConfiguration('client_id'));
@@ -1140,7 +1145,7 @@ class strava extends eqLogic {
                 foreach ($extensions as $extension) {
                     if(strava::endsWith($name, $extension)) {
                         log::add('strava', 'debug', '  Initialize ' . $cmd->getHumanName() . ' new day (' . ($_dayLastActivity + 1) . ') starting ' . $nextDay . ' to (0/0)');
-                        $this->checkAndUpdateCmd($cmd, 0, $nextWeek);
+                        $this->checkAndUpdateCmd($cmd, 0, $nextDay);
                         break;
                     }
                 }
@@ -1206,7 +1211,7 @@ class strava extends eqLogic {
                 foreach ($extensions as $extension) {
                     if(strava::endsWith($name, $extension)) {
                         log::add('strava', 'debug', '  Initialize ' . $cmd->getHumanName() . ' new month (' . ($_monthLastActivity + 1) . ') starting ' . $nextMonth . ' to (0/0)');
-                        $this->checkAndUpdateCmd($cmd, 0, $monthWeek);
+                        $this->checkAndUpdateCmd($cmd, 0, $nextMonth);
                         break;
                     }
                 }

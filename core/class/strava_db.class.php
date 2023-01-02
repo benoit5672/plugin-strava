@@ -16,7 +16,7 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+ 
 class stravaActivity {
 
 	/*     * *************************Attributs****************************** */
@@ -82,7 +82,7 @@ class stravaActivity {
      * Return an array of elements for the specified eqLogicId,
      * and between start and end (in seconds UTC)
      */
-    public function byEqLogicIdTime($_eqLogicId, $_start, $_end) {
+    public static function byEqLogicIdTime($_eqLogicId, $_start, $_end) {
 
 		$parameters = array(
 			'eqLogicId' => $_eqLogicId,
@@ -236,7 +236,7 @@ class stravaActivity {
     }
 
 	public function getStravaId() {
-        return $this->getStravaId;
+        return $this->stravaId;
     }
 
     public function getSport() {
