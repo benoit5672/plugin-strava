@@ -14,8 +14,8 @@ Le plugin Strava de Jeedom a été développé de manière à être compatible a
 Ce plugin permet d'associer Jeedom à Strava, et ainsi récupérer les activités de l'athlète.
 L'objectif n'est pas de dupliquer les informations contenues dans Strava, mais plutôt de récupérer les informations pertinentes des activités, et de les consolider pour avoir une vue personnalisée.
 
->Par exemple, Strava propose par défaut un résumé hebdomadaire et annuelle pour trois sports : natation, vélo, et course à pied. Avec le plugin, il est possible d'avoir ce même résumé pour 37 sports différents !
->![37sports](./docs/assets/images/37sports.png)
+>Par exemple, Strava propose par défaut un résumé hebdomadaire et annuelle pour trois sports : natation, vélo, et course à pied. Avec le plugin, il est possible d'avoir ce même résumé pour 50 sports différents !
+>![37sports](./docs/assets/images/50sports.png)
 
 Le plugin se base sur l'API Strava, qui péopose 2 types de requêtes.
 
