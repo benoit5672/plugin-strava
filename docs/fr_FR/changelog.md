@@ -13,6 +13,13 @@ Le plugin Strava de Jeedom a été développé de manière à être compatible a
 
 ***
 
+## 14/22/2023 (beta 1.3)
+
+Version basee sur la version beta-1.2
+
+* **nouveau**: 13 nouveaux sports ont été ajoutés (Badminton, eVTT, Gravel, HIIT, VTT, Pickleball, Pilates, Racquetball, Squash, Tennis de table, Tennis, 
+Trail, Vélo couché (salle)
+
 ## 25/11/2022 (beta 1.2)
 
 Version basée sur la version stable-1.1
@@ -27,7 +34,7 @@ Version basée sur la version stable-1.1
 Version basée sur la version stable-1.0.
 Toutes les informations de Strava se trouvant en base de données Jeedom, que le sport soit coché ou non dans la configuration
 de l'athlète, j'ai revu quelques peu la gestion de l'athlète.
-1. les sports configures sont les sports pour lesquels vous voulez le detail des activités. Pour chaque sport coché, vous aurez le nombre de séances, le temps d'effort, et le dénivelé par semaine et par an.
+1. les sports configurés sont les sports pour lesquels vous voulez le detail des activités. Pour chaque sport coché, vous aurez le nombre de séances, le temps d'effort, et le dénivelé par semaine et par an.
 2. **nouveau**: j'ai ajoute 6 compteurs "globaux", c'est a dire indépendant des sports sélectionnés dans la configuration de l'athlète.  
 
 * Compteur du nombre d'activités par jour. Ce champ est historiser par défaut, mode de lissage "max", et garder pendant 1 an.

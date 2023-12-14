@@ -72,7 +72,20 @@ class stravaActivity {
 		   'Wheelchair' => 34,
 		   'Windsurf' => 35,
 		   'Workout' => 36,
-		   'Yoga' => 37
+		   'Yoga' => 37,
+		   'Badminton' => 38,
+		   'EMountainBikeRide' => 39, 
+		   'GravelRide' => 40,  
+		   'HighIntensityIntervalTraining' => 41, 
+		   'MountainBikeRide' => 42, 
+		   'Pickleball' => 43,
+		   'Pilates' => 44, 
+		   'Racquetball' => 45, 
+		   'Squash' => 46, 
+		   'TableTennis' => 47, 
+		   'Tennis' => 48, 
+		   'TrailRun' => 49, 
+		   'VirtualRow' => 50 		   
 		];
 		return $sports[$_type];
 	}

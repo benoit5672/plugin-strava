@@ -1195,8 +1195,8 @@ class strava extends eqLogic {
             $t_d_m = $this->getCmd(null, 'total_duration_month');
 
             // set the new month to 0.
-            $months = 
-            $nextMonth = strftime('%B', mktime(0, 0, 0, $_monthLastActivity + 1));
+            //$nextMonth = strftime('%B', mktime(0, 0, 0, $_monthLastActivity + 1));
+            $nextMonth = date('Y-m-d 00:00:00', mktime(0, 0, 0, $_monthLastActivity + 1, 1));
             if (is_object($t_c_m) and is_object($t_d_m)) {
                 log::add('strava', 'info', '  ** Initialize new month #' . ($_monthLastActivity + 1) . ' starting ' . $nextMonth . ' to (0/0)');
                 $this->checkAndUpdateCmd($t_c_m, 0, $nextMonth);
@@ -1756,7 +1756,20 @@ class strava extends eqLogic {
                'Wheelchair' => __('Course en fauteuil', __FILE__),
                'Windsurf' => __('Windsurf', __FILE__),
                'Workout' => __('Entraînement', __FILE__),
-               'Yoga' => __('Yoga', __FILE__)
+               'Yoga' => __('Yoga', __FILE__),
+               'Badminton' => __('Badminton', __FILE__),
+               'EMountainBikeRide' => __('VTT électrique', __FILE__),
+               'GravelRide' => __('Gravel', __FILE__),
+               'HighIntensityIntervalTraining' => __('HIIT', __FILE__),
+               'MountainBikeRide' => __('VTT', __FILE__),
+               'Pickleball' => __('Pickleball', __FILE__),
+               'Pilates' => __('Pilates', __FILE__),
+               'Racquetball' => __('Racquetball', __FILE__),
+               'Squash' => __('Squash', __FILE__),
+               'TableTennis' => __('Tennis de table', __FILE__),
+               'Tennis' => __('Tennis', __FILE__),
+               'TrailRun' => __('Trail', __FILE__),
+               'VirtualRow' => __('Vélo couché virtuel', __FILE__)                          
            ];
 
         foreach ($sports as $key => $value) {

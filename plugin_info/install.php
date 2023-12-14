@@ -37,9 +37,15 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
                 . '(21, "Skateboard"), (22, "Snowboard"), (23, "Snowshoe"), '
                 . '(24, "Soccer"), (25, "StairStepper"), (26, "StandUpPaddling"), '
                 . '(27, "Surfing"), (28, "Swim"), (29, "Velomobile"), '
-                . '(30, "VirtualRide"), (31, "VirtualRun"), (32, "Walk") ,'
+                . '(30, "VirtualRide"), (31, "VirtualRun"), (32, "Walk"), '
                 . '(33, "WeightTraining"), (34, "Wheelchair"), (35, "Windsurf"), '
-                . '(36, "Workout"), (37, "Yoga");';
+                . '(36, "Workout"), (37, "Yoga"), '
+                . '(38, "Badminton"), (39, "EMountainBikeRide"), (40, "GravelRide"), ' 
+                . '(41, "HighIntensityIntervalTraining"), (42, "MountainBikeRide"), ' 
+                . '(43, "Pickleball"), (44, "Pilates"), (45, "Racquetball"), '
+                . '(46, "Squash"), (47, "TableTennis"), (48, "Tennis"), '
+                . '(49, "TrailRun"), (50, "VirtualRow");' 
+                
       DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
 
       // Create the table where the activities are stored

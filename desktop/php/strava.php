@@ -218,7 +218,20 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                     'Wheelchair' => '{{Course en fauteuil}}',
                                     'Windsurf' => '{{Windsurf}}',
                                     'Workout' => '{{Entraînement}}',
-                                    'Yoga' => '{{Yoga}}'
+                                    'Yoga' => '{{Yoga}}',
+                                    'Badminton' => '{{Badminton}}',
+                                    'EMountainBikeRide' => '{{VTT électrique}}', 
+                                    'GravelRide' => '{{Gravel}}',  
+                                    'HighIntensityIntervalTraining' => '{{HIIT}}', 
+                                    'MountainBikeRide' => '{{VTT}}', 
+                                    'Pickleball' => '{{Pickleball}}', 
+                                    'Pilates' => '{{Pilates}}', 
+                                    'Racquetball' => '{{Racquetball}}', 
+                                    'Squash' => '{{Squash}}', 
+                                    'TableTennis' => '{{Tennis de table}}', 
+                                    'Tennis' => '{{Tennis}}', 
+                                    'TrailRun' => '{{Trail}}', 
+                                    'VirtualRow' => '{{Vélo couché virtuel}}'                              
                                 ];
                                 foreach ($sports as $key => $value) {
                                     echo '   <label class="control-label col-sm-3">' . $value . '</label>';
@@ -282,7 +295,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 <th>{{Type}}</th>
                                 <th>{{Options}}</th>
                                 <th>{{Etat}}</th>
-                                <th>{{Actions}}</th>
+                                <th>{{Action}}</th>
                             </tr>
                         </thead>
                         <tbody>
