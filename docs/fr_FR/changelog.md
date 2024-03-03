@@ -13,11 +13,15 @@ Le plugin Strava de Jeedom a été développé de manière à être compatible a
 
 ***
 
+## 03/03/2024 stable 1.3
+
+Cette version contient tous les developpements beta depuis la 1.0, soit beta-1.1, beta-1.2 et beta-1.3
+
 ## 14/22/2023 (beta 1.3)
 
 Version basee sur la version beta-1.2
 
-* **nouveau**: 13 nouveaux sports ont été ajoutés (Badminton, eVTT, Gravel, HIIT, VTT, Pickleball, Pilates, Racquetball, Squash, Tennis de table, Tennis, 
+* **nouveau**: 13 nouveaux sports ont été ajoutés (Badminton, eVTT, Gravel, HIIT, VTT, Pickleball, Pilates, Racquetball, Squash, Tennis de table, Tennis,
 Trail, Vélo couché (salle)
 
 ## 25/11/2022 (beta 1.2)
