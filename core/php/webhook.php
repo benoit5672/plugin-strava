@@ -17,7 +17,7 @@
 */
 
 
-require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
+require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 log::add('strava', 'debug', 'Received webhook notification: ' . $_SERVER['REQUEST_URI']);
 

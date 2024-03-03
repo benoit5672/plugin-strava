@@ -16,7 +16,7 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+ 
 class stravaActivity {
 
 	/*     * *************************Attributs****************************** */
@@ -72,7 +72,20 @@ class stravaActivity {
 		   'Wheelchair' => 34,
 		   'Windsurf' => 35,
 		   'Workout' => 36,
-		   'Yoga' => 37
+		   'Yoga' => 37,
+		   'Badminton' => 38,
+		   'EMountainBikeRide' => 39, 
+		   'GravelRide' => 40,  
+		   'HighIntensityIntervalTraining' => 41, 
+		   'MountainBikeRide' => 42, 
+		   'Pickleball' => 43,
+		   'Pilates' => 44, 
+		   'Racquetball' => 45, 
+		   'Squash' => 46, 
+		   'TableTennis' => 47, 
+		   'Tennis' => 48, 
+		   'TrailRun' => 49, 
+		   'VirtualRow' => 50 		   
 		];
 		return $sports[$_type];
 	}
@@ -82,7 +95,7 @@ class stravaActivity {
      * Return an array of elements for the specified eqLogicId,
      * and between start and end (in seconds UTC)
      */
-    public function byEqLogicIdTime($_eqLogicId, $_start, $_end) {
+    public static function byEqLogicIdTime($_eqLogicId, $_start, $_end) {
 
 		$parameters = array(
 			'eqLogicId' => $_eqLogicId,
@@ -191,6 +204,28 @@ class stravaActivity {
 	}
 
 
+	/**
+	 * Get the last_update for the specified eqLogic.
+	 */
+	public static function getLastUpdate($_eqLogicId) {
+
+		$parameters = array (
+			'eqLogicId' => $_eqLogicId,
+        );
+		
+        $sql = 'SELECT eqLogicId, stravaId, time, name AS type, distance, duration, elevation
+				FROM `stravaActivity` activity, `stravaSport` sport
+				WHERE `eqLogicId` = :eqLogicId AND activity.type = sport.type
+				GROUP BY eqLogicId, time ORDER BY time DESC LIMIT 1;';
+		$values = DB::Prepare($sql, $parameters, DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, __CLASS__);
+		if (!is_array($values) || count($values) != 1 || !is_a($values[0], 'stravaActivity')) {
+			return strtotime('first day of January this year GMT');
+		}
+		return $values[0]->getTime();
+	}
+	
+
+
 	/*     * *********************Methode d'instance************************* */
 
     public function __construct($obj = null){
@@ -214,7 +249,7 @@ class stravaActivity {
     }
 
 	public function getStravaId() {
-        return $this->getStravaId;
+        return $this->stravaId;
     }
 
     public function getSport() {

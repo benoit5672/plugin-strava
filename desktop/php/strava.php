@@ -177,7 +177,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
                         </div>
                         <!-- Partie droite de l'onglet "Equipement" -->
                         <div class="col-lg-6">
-                            <legend><i class="fas fa-info"></i> {{Sports}}</legend>
+                            <legend><i class="fas fa-info"></i> {{Activités}}</legend>
                             <div class="form-group">
                             <?php
 
@@ -218,7 +218,20 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                     'Wheelchair' => '{{Course en fauteuil}}',
                                     'Windsurf' => '{{Windsurf}}',
                                     'Workout' => '{{Entraînement}}',
-                                    'Yoga' => '{{Yoga}}'
+                                    'Yoga' => '{{Yoga}}',
+                                    'Badminton' => '{{Badminton}}',
+                                    'EMountainBikeRide' => '{{VTT électrique}}', 
+                                    'GravelRide' => '{{Gravel}}',  
+                                    'HighIntensityIntervalTraining' => '{{HIIT}}', 
+                                    'MountainBikeRide' => '{{VTT}}', 
+                                    'Pickleball' => '{{Pickleball}}', 
+                                    'Pilates' => '{{Pilates}}', 
+                                    'Racquetball' => '{{Racquetball}}', 
+                                    'Squash' => '{{Squash}}', 
+                                    'TableTennis' => '{{Tennis de table}}', 
+                                    'Tennis' => '{{Tennis}}', 
+                                    'TrailRun' => '{{Trail}}', 
+                                    'VirtualRow' => '{{Vélo couché virtuel}}'                              
                                 ];
                                 foreach ($sports as $key => $value) {
                                     echo '   <label class="control-label col-sm-3">' . $value . '</label>';
@@ -228,6 +241,26 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                 }
                             ?>
                             </div>
+                            <br>
+                            <legend><i class="fas fa-wrench"></i> {{Suivi des activités}}</legend>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">{{par jour}}</label>
+                                <div class="col-sm-1">
+                                    <input type="checkbox" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="track_per_day"/>
+                                </div>
+                                <label class="col-sm-2 control-label">{{par semaine}}</label>
+                                <div class="col-sm-1">                                
+                                    <input type="checkbox" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="track_per_week" checked/>
+                                </div>
+                                <label class="col-sm-2 control-label">{{par mois}}</label>
+                                <div class="col-sm-1">                                
+                                    <input type="checkbox" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="track_per_month"/>
+                                </div>
+                                <label class="col-sm-2 control-label">{{par an}}</label>
+                                <div class="col-sm-1">                               
+                                    <input type="checkbox" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="track_per_year" checked/>
+                                </div>
+                            </div> 
                             <br>
                             <legend><i class="fas fa-wrench"></i> {{Statistiques}}</legend>
                             <div class="form-group">
@@ -259,8 +292,9 @@ $eqLogics = eqLogic::byType($plugin->getId());
                         <thead>
                             <tr>
                                 <th>{{Nom}}</th>
+                                <th>{{Type}}</th>
                                 <th>{{Options}}</th>
-                                <th>{{Paramètres}}</th>
+                                <th>{{Etat}}</th>
                                 <th>{{Action}}</th>
                             </tr>
                         </thead>

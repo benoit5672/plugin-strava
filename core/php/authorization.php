@@ -16,7 +16,8 @@
 * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
 */
 
-require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
+require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
+
 
 log::add('strava', 'debug', 'Received authorization request: ' . $_SERVER['REQUEST_URI']);
 
@@ -115,6 +116,6 @@ try {
 
 } catch (Exception $e) {
     log::add('strava', 'error', $e->getMessage());
-    http_error_code(500);
+    http_response_code(500);
 	exit(print_r($e));
 }
