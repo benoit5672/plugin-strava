@@ -13,6 +13,10 @@ Le plugin Strava de Jeedom a été développé de manière à être compatible a
 
 ***
 
+## 04/01/2026 stable 1.4
+
+Mise a jour pour etre compatible avec Jeedom 4.5. Cette version fixe les problemes 'StravaLock: Class not found', et 'StravaProvider: Class not found'.
+
 ## 03/03/2024 stable 1.3
 
 Cette version contient tous les developpements beta depuis la 1.0, soit beta-1.1, beta-1.2 et beta-1.3
