@@ -18,12 +18,14 @@
 
 /* * ***************************Includes********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
+if(file_exists(__DIR__ . '/../../vendor/autoload.php')){
+	require_once __DIR__ . '/../../vendor/autoload.php';
+}
 require_once __DIR__  . '/strava_provider.class.php';
 require_once __DIR__  . '/strava_owner.class.php';
 require_once __DIR__  . '/strava_db.class.php';
 require_once __DIR__  . '/strava_lock.class.php';
-
-
+≈
 use League\OAuth2\Client\Token\AccessToken;
 
 class strava extends eqLogic {
