@@ -25,7 +25,7 @@ require_once __DIR__  . '/strava_provider.class.php';
 require_once __DIR__  . '/strava_owner.class.php';
 require_once __DIR__  . '/strava_db.class.php';
 require_once __DIR__  . '/strava_lock.class.php';
-≈
+
 use League\OAuth2\Client\Token\AccessToken;
 
 class strava extends eqLogic {
@@ -227,6 +227,8 @@ class strava extends eqLogic {
             $_options);
 
         // Update our usage counters
+        $limit = $rsp->getHeader('X-Ratelimit-Limit');
+        $usage = $rsp->getHeader('X-Ratelimit-Usage');        
         if (count($limit) > 0 and count($usage) > 0) {
             self::setStravaQuota('15mLimit', $limit[0]);
             self::setStravaQuota('dayLimit', $limit[1]);
@@ -1709,7 +1711,7 @@ class strava extends eqLogic {
 
    		$cmd = $this->getCmd(null, 'setWeight');
         if (!is_object($cmd)) {
-            $cmd = new StravaCmd();
+            $cmd = new stravaCmd();
             $cmd->setLogicalId('setWeight');
             $cmd->setIsVisible(0);
             $cmd->setName(__('Envoyer poids', __FILE__));
@@ -1788,7 +1790,7 @@ class strava extends eqLogic {
         // Refresh action
         $cmd = $this->getCmd(null, 'refresh');
         if (!is_object($cmd)) {
-            $cmd = new StravaCmd();
+            $cmd = new stravaCmd();
             $cmd->setLogicalId('refresh');
             $cmd->setIsVisible(1);
             $cmd->setName(__('Rafraîchir', __FILE__));
@@ -1801,7 +1803,7 @@ class strava extends eqLogic {
         // Total activities, monitored or not
         $cmd = $this->getCmd(null, 'total_count_day');
         if (!is_object($cmd)) {
-            $cmd = new StravaCmd();
+            $cmd = new stravaCmd();
             $cmd->setLogicalId('total_count_day');
             $cmd->setIsVisible(1);
             $cmd->setName(__('Total activitées (jour)', __FILE__));
@@ -1818,7 +1820,7 @@ class strava extends eqLogic {
 
         $cmd = $this->getCmd(null, 'total_count_week');
         if (!is_object($cmd)) {
-            $cmd = new StravaCmd();
+            $cmd = new stravaCmd();
             $cmd->setLogicalId('total_count_week');
             $cmd->setIsVisible(1);
             $cmd->setName(__('Total activitées (semaine)', __FILE__));
@@ -1832,7 +1834,7 @@ class strava extends eqLogic {
 
         $cmd = $this->getCmd(null, 'total_count_month');
         if (!is_object($cmd)) {
-            $cmd = new StravaCmd();
+            $cmd = new stravaCmd();
             $cmd->setLogicalId('total_count_month');
             $cmd->setIsVisible(1);
             $cmd->setName(__('Total activitées (mois)', __FILE__));
@@ -1846,7 +1848,7 @@ class strava extends eqLogic {
 
         $cmd = $this->getCmd(null, 'total_count_year');
         if (!is_object($cmd)) {
-            $cmd = new StravaCmd();
+            $cmd = new stravaCmd();
             $cmd->setLogicalId('total_count_year');
             $cmd->setIsVisible(1);
             $cmd->setName(__('Total activitées (année)', __FILE__));
@@ -1860,7 +1862,7 @@ class strava extends eqLogic {
 
         $cmd = $this->getCmd(null, 'total_duration_day');
         if (!is_object($cmd)) {
-            $cmd = new StravaCmd();
+            $cmd = new stravaCmd();
             $cmd->setLogicalId('total_duration_day');
             $cmd->setIsVisible(1);
             $cmd->setName(__('Durée totale (jour)', __FILE__));
@@ -1877,7 +1879,7 @@ class strava extends eqLogic {
 
         $cmd = $this->getCmd(null, 'total_duration_week');
         if (!is_object($cmd)) {
-            $cmd = new StravaCmd();
+            $cmd = new stravaCmd();
             $cmd->setLogicalId('total_duration_week');
             $cmd->setIsVisible(1);
             $cmd->setName(__('Durée totale (semaine)', __FILE__));
@@ -1891,7 +1893,7 @@ class strava extends eqLogic {
 
         $cmd = $this->getCmd(null, 'total_duration_month');
         if (!is_object($cmd)) {
-            $cmd = new StravaCmd();
+            $cmd = new stravaCmd();
             $cmd->setLogicalId('total_duration_month');
             $cmd->setIsVisible(1);
             $cmd->setName(__('Durée totale (mois)', __FILE__));
@@ -1905,7 +1907,7 @@ class strava extends eqLogic {
 
         $cmd = $this->getCmd(null, 'total_duration_year');
         if (!is_object($cmd)) {
-            $cmd = new StravaCmd();
+            $cmd = new stravaCmd();
             $cmd->setLogicalId('total_duration_year');
             $cmd->setIsVisible(1);
             $cmd->setName(__('Durée totale (année)', __FILE__));
