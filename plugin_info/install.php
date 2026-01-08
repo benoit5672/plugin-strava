@@ -44,7 +44,7 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
                 . '(41, "HighIntensityIntervalTraining"), (42, "MountainBikeRide"), ' 
                 . '(43, "Pickleball"), (44, "Pilates"), (45, "Racquetball"), '
                 . '(46, "Squash"), (47, "TableTennis"), (48, "Tennis"), '
-                . '(49, "TrailRun"), (50, "VirtualRow");' 
+                . '(49, "TrailRun"), (50, "VirtualRow");';
                 
       DB::Prepare($sql, array(), DB::FETCH_TYPE_ROW);
 
